@@ -44,11 +44,11 @@ Three architectural decisions separate this from a demo that simply calls an LLM
 
 ```mermaid
 flowchart TD
-    A["SEC EDGAR XBRL API<br/>real filed financial facts"] --> B["Deterministic Engine<br/>(pure Python, no LLM)<br/>Altman Z' Â· Piotroski F Â· 11 ratios"]
+    A["SEC EDGAR XBRL API<br/>real filed financial facts"] --> B["Deterministic Engine<br/>(pure Python, no LLM)<br/>Altman Z' · Piotroski F · 11 ratios"]
     A --> C["Item 1A Risk-Factor Extraction<br/>+ keyword categorization<br/>(deterministic)"]
     B --> D["SQLite Persistence<br/>company-scoped CompanyDossier"]
     C --> E["Retrieval Index<br/>(TF-IDF over risk-factor chunks)"]
-    D --> F["Streamlit Dashboard<br/>Overview Â· Metrics Â· Trends Â· Data Quality"]
+    D --> F["Streamlit Dashboard<br/>Overview · Metrics · Trends · Data Quality"]
     D --> G["Narrative Prompt Builder<br/>trusted metrics + retrieved evidence only"]
     E --> G
     G --> H["Local LLM (Ollama)<br/>drafts plain-English narrative"]
@@ -78,7 +78,7 @@ The Altman Z'-Score model was backtested against real corporate bankruptcies (Be
 
 ## Tech Stack
 
-Python Â· Streamlit Â· SEC EDGAR XBRL Â· SQLite Â· Ollama (local LLM inference) Â· Retrieval-Augmented Generation Â· pytest
+Python · Streamlit · SEC EDGAR XBRL · SQLite · Ollama (local LLM inference) · Retrieval-Augmented Generation · pytest
 
 ## Requirements
 
@@ -135,4 +135,5 @@ Full architectural decision records, the historical backtest methodology, and th
 ## Status
 
 Complete and verified. Full test suite passing; see `docs/09_final_verification_report.md` for the complete verification trail.
+
 
