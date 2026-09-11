@@ -66,6 +66,19 @@ flowchart TD
 
 The dashed line running through this diagram is the one that matters: everything left of the grounding critic is either deterministic computation or retrieved-verbatim filing text; the LLM only ever sees material that already passed through that boundary, and nothing it produces reaches a human reviewer without passing back through the critic first.
 
+## Screenshots
+
+### Company Risk Dashboard
+![RiskCopilot Company Risk Dashboard](docs/images/company_overview.png)
+
+### AI Risk Narrative & Grounding Verification
+![RiskCopilot AI Risk Narrative](docs/images/agentic_narrative.png)
+
+### SEC Filing Evidence
+![RiskCopilot SEC Filing Evidence](docs/images/narrative_evidence.png)
+
+### Historical Bankruptcy Validation
+![RiskCopilot Historical Validation](docs/images/historical_validation.png)
 ## Historical Validation
 
 The Altman Z'-Score model was backtested against real corporate bankruptcies (Bed Bath & Beyond, Party City) using pre-event filing snapshots. It correctly flagged 3 of 4 snapshots as grey-zone or distressed ahead of the actual bankruptcy filing. This is an honest, small-sample result (N=2 companies), not a statistically powered accuracy claim, and the full methodology and its limitations are documented rather than glossed over.
@@ -135,5 +148,6 @@ Full architectural decision records, the historical backtest methodology, and th
 ## Status
 
 Complete and verified. Full test suite passing; see `docs/09_final_verification_report.md` for the complete verification trail.
+
 
 
