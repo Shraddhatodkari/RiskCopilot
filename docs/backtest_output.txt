@@ -1,0 +1,20 @@
+=== Historical Distress Backtest (Altman Z'-Score) ===
+Source: distress_backtest_cases.json (real SEC XBRL data; see docs/06_historical_backtest.md)
+
+Bed Bath & Beyond Inc. (CIK 0000886158)
+  Known event: Filed Chapter 11 bankruptcy petition on 2023-04-23
+  FY2021 (period end 2022-02-26, filed BEFORE the event on 2022-04-21): Z'=2.9344 -> SAFE | lead time vs. event: 421 days | MISSED
+  FY2022 (period end 2023-02-25, filed AFTER the event on 2023-06-14): Z'=-2.0776 -> DISTRESS | lead time vs. event: 57 days | FLAGGED
+
+Party City Holdco Inc. (CIK 0001592058)
+  Known event: Filed Chapter 11 bankruptcy petition on 2023-01-17
+  FY2021 (period end 2021-12-31, filed BEFORE the event on 2022-02-28): Z'=0.7644 -> DISTRESS | lead time vs. event: 382 days | FLAGGED
+  FY2022 (period end 2022-12-31, filed AFTER the event on 2024-03-28): Z'=-1.4793 -> DISTRESS | lead time vs. event: 17 days | FLAGGED
+
+--- Summary ---
+Total pre-event snapshots evaluated: 4
+Flagged (grey or distress zone):     3 (75%)
+  of which distress-zone (strong):   3
+Missed (safe zone):                  1
+
+This is an honest, small (N=2 companies, 4 snapshots) real backtest — not a statistically powered accuracy claim. See docs/06_historical_backtest.md for the full discussion, including the one real miss.

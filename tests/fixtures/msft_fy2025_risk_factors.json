@@ -1,0 +1,50 @@
+{
+  "_provenance": "Extracted from the real, live text of Microsoft Corporation's FY2025 10-K, Item 1A (Risk Factors), fetched from https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm on 2026-09-09. Accession 0000950170-25-100235, filed 2025-07-30, period end 2025-06-30. Each chunk's `text` field is a verbatim quoted sentence from the actual filing (not a paraphrase) — used to demonstrate genuine, company-specific retrieval (src/retrieval/tfidf_index.py) without requiring a live network call or any LLM during automated tests. This fixture exists specifically to close a real cross-company-contamination gap: prior to this fixture, the dashboard's Agentic Narrative tab used Apple's risk-factor text regardless of which company was selected — see docs/02_architecture_decision_record.md ADR-012.",
+  "cik": "0000789019",
+  "entity_name": "Microsoft Corporation",
+  "fiscal_year": 2025,
+  "accession_number": "0000950170-25-100235",
+  "source_document_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+  "chunks": [
+    {
+      "chunk_id": "msft-2025-rf-1",
+      "heading": "Intense Competition Across Markets",
+      "text": "Our competitors range in size from diversified global companies with significant research and development resources to small, specialized firms whose narrower product lines may let them be more effective in deploying technical, marketing, and financial resources."
+    },
+    {
+      "chunk_id": "msft-2025-rf-2",
+      "heading": "Cloud and AI Services Execution Risks",
+      "text": "Our focus on cloud-based and AI services presents execution and competitive risks. We are incurring significant costs to build and maintain infrastructure to support cloud-based and AI services, reducing operating margins."
+    },
+    {
+      "chunk_id": "msft-2025-rf-3",
+      "heading": "Cyberattacks and Security Vulnerabilities",
+      "text": "Threats to security can take a variety of forms. Threat actors, including individual and groups of hackers and sophisticated organizations, including nation-states, state-sponsored organizations, or cybercriminal groups, continuously undertake attacks that pose threats to our customers and our internal infrastructure."
+    },
+    {
+      "chunk_id": "msft-2025-rf-4",
+      "heading": "Product Development and Investment Returns",
+      "text": "We make significant investments in products and services that may not achieve expected returns. We will continue to make significant investments in research, development, and marketing for existing products, services, and technologies, including AI-based products and services."
+    },
+    {
+      "chunk_id": "msft-2025-rf-5",
+      "heading": "Data Privacy and Personal Data Disclosure",
+      "text": "Disclosure and misuse of personal data could result in liability and harm our reputation. As we continue to grow the number, breadth, and scale of our cloud-based offerings, we store and process increasingly large amounts of personal data of our customers and users."
+    },
+    {
+      "chunk_id": "msft-2025-rf-6",
+      "heading": "AI Development and Deployment Risks",
+      "text": "Issues in the development, deployment, and use of AI may result in reputational or competitive harm or liability. We are building AI into many of our offerings, including our productivity services, and we are also making AI available for our customers to use in solutions that they build."
+    },
+    {
+      "chunk_id": "msft-2025-rf-7",
+      "heading": "Regulatory Compliance and Legal Requirements",
+      "text": "We are subject to a wide range of laws, regulations, and legal requirements in the U.S. and globally, including those that may apply to our products and online services offerings, and those that impose requirements related to user privacy, telecommunications, data storage and protection, digital accessibility, advertising, and online safety."
+    },
+    {
+      "chunk_id": "msft-2025-rf-8",
+      "heading": "Supply Chain and Component Availability",
+      "text": "There are few qualified suppliers for certain device and datacenter components. We continue to identify and evaluate opportunities to expand our datacenter locations and increase our server capacity to meet the evolving needs of our customers, particularly given the growing demand for AI services."
+    }
+  ]
+}

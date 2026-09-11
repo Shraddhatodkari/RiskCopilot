@@ -1,0 +1,75 @@
+{
+  "_provenance": "Real XBRL figures for two companies that filed real, publicly documented Chapter 11 bankruptcy petitions, fetched live from data.sec.gov on 2026-09-08. Every figure below was cross-checked against the complete raw units.USD array for its tag (not just a filtered/summarized response) after an initial fetch attempt produced one incorrect value (Party City's FY2021 current liabilities), which is itself documented in docs/06_historical_backtest.md as a real methodological finding about the risk of trusting summarized API responses over raw data — exactly the failure mode this project's own code (src/ingestion/xbrl_facts.py) is built to avoid by parsing raw JSON directly rather than through any summarization step.",
+  "cases": [
+    {
+      "company_name": "Bed Bath & Beyond Inc.",
+      "cik": "0000886158",
+      "known_event": "Filed Chapter 11 bankruptcy petition",
+      "known_event_date": "2023-04-23",
+      "event_source_note": "Widely reported real event; the original New Jersey retailer (CIK 0000886158) — NOT to be confused with a separate, later CIK (0001130713) that Overstock.com took on after acquiring the Bed Bath & Beyond brand name post-bankruptcy, a real entity-resolution gotcha found during this research.",
+      "snapshots": [
+        {
+          "fiscal_year": 2021,
+          "accession_number": "0000886158-22-000047",
+          "filed": "2022-04-21",
+          "period_end": "2022-02-26",
+          "total_assets": 5130572000,
+          "total_liabilities": 4956427000,
+          "current_assets": 2363154000,
+          "current_liabilities": 2074787000,
+          "retained_earnings": 9666091000,
+          "operating_income": -407578000,
+          "revenues": 7867778000
+        },
+        {
+          "fiscal_year": 2022,
+          "accession_number": "0000886158-23-000059",
+          "filed": "2023-06-14",
+          "period_end": "2023-02-25",
+          "total_assets": 2225217000,
+          "total_liabilities": 5025225000,
+          "current_assets": 1096909000,
+          "current_liabilities": 2495884000,
+          "retained_earnings": 225058000,
+          "operating_income": -2775639000,
+          "revenues": 5344685000
+        }
+      ]
+    },
+    {
+      "company_name": "Party City Holdco Inc.",
+      "cik": "0001592058",
+      "known_event": "Filed Chapter 11 bankruptcy petition",
+      "known_event_date": "2023-01-17",
+      "event_source_note": "Widely reported real event.",
+      "snapshots": [
+        {
+          "fiscal_year": 2021,
+          "accession_number": "0000950170-22-002280",
+          "filed": "2022-02-28",
+          "period_end": "2021-12-31",
+          "total_assets": 2711900000,
+          "total_liabilities": 2629186000,
+          "current_assets": 698483000,
+          "current_liabilities": 570059000,
+          "retained_earnings": -571985000,
+          "operating_income": 84632000,
+          "revenues": 2171060000
+        },
+        {
+          "fiscal_year": 2022,
+          "accession_number": "0000950170-24-037962",
+          "filed": "2024-03-28",
+          "period_end": "2022-12-31",
+          "total_assets": 2019997000,
+          "total_liabilities": 2877824000,
+          "current_assets": 832508000,
+          "current_liabilities": 2150719000,
+          "retained_earnings": -1514615000,
+          "operating_income": -860266000,
+          "revenues": 2169878000
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+=== Financial Risk Memo: Microsoft Corporation — FY2025 ===
+(source: msft_fy2025_companyconcept.json, a frozen capture of real data.sec.gov responses)
+
+Altman Z'-Score: 2.006  ->  zone: GREY
+
+Components:
+  X1_working_capital_to_assets = (current_assets - current_liabilities) / total_assets = 0.0806
+  X2_retained_earnings_to_assets = retained_earnings / total_assets = 0.3841
+  X3_ebit_to_assets = operating_income / total_assets  (EBIT proxy) = 0.2076
+  X4_book_equity_to_liabilities = book_value_of_equity / total_liabilities = 1.2466
+  X5_sales_to_assets = revenues / total_assets = 0.4551
+
+Source facts (each traceable to a real, filed SEC document):
+  - total_assets: $619,003,000,000 | 10-K filed 2025-07-30 (accession 0000950170-25-100235) | https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/0000950170-25-100235-index.htm
+  - total_liabilities: $275,524,000,000 | 10-K filed 2025-07-30 (accession 0000950170-25-100235) | https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/0000950170-25-100235-index.htm
+  - current_assets: $191,131,000,000 | 10-K filed 2025-07-30 (accession 0000950170-25-100235) | https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/0000950170-25-100235-index.htm
+  - current_liabilities: $141,218,000,000 | 10-K filed 2025-07-30 (accession 0000950170-25-100235) | https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/0000950170-25-100235-index.htm
+  - retained_earnings: $237,731,000,000 | 10-K filed 2025-07-30 (accession 0000950170-25-100235) | https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/0000950170-25-100235-index.htm
+  - operating_income: $128,528,000,000 | 10-K filed 2025-07-30 (accession 0000950170-25-100235) | https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/0000950170-25-100235-index.htm
+  - revenues: $281,724,000,000 | 10-K filed 2025-07-30 (accession 0000950170-25-100235) | https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/0000950170-25-100235-index.htm
+  - stockholders_equity: $343,479,000,000 | 10-K filed 2025-07-30 (accession 0000950170-25-100235) | https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/0000950170-25-100235-index.htm
+
+==============================================================================
+
+=== Financial Risk Memo: Apple Inc. — FY2025 ===
+(source: aapl_fy2025_companyconcept.json, a frozen capture of real data.sec.gov responses)
+
+DATA QUALITY ISSUES (real, not simulated):
+  - [missing] retained_earnings: No value found for fiscal_year=2025 after trying tag(s) ['RetainedEarningsAccumulatedDeficit']. Either the company does not report this concept, uses a non-standard tag not yet in our fallback list, or the value is only reported inside a dimensional breakdown that the companyconcept API omits.
+  - [missing] stockholders_equity: No value found for fiscal_year=2025 after trying tag(s) ['StockholdersEquity']. Either the company does not report this concept, uses a non-standard tag not yet in our fallback list, or the value is only reported inside a dimensional breakdown that the companyconcept API omits.
+
+Altman Z'-Score: CANNOT BE COMPUTED — Cannot compute Altman Z'-Score: missing real data for ['retained_earnings']. Refusing to substitute an assumed or fabricated value for a financial-risk calculation.
+

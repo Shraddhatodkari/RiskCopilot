@@ -1,0 +1,40 @@
+{
+  "_provenance": "Extracted from the real, live text of NVIDIA Corporation's FY2025 10-K, Item 1A (Risk Factors), fetched from https://www.sec.gov/Archives/edgar/data/1045810/000104581025000023/nvda-20250126.htm on 2026-09-10. Accession 0001045810-25-000023, filed 2025-02-26, period end 2025-01-26 (NVIDIA's fiscal year runs Feb-Jan). Each chunk's `text` field is a verbatim quoted sentence from the actual filing (not a paraphrase). This fixture exists to prove the risk-evidence architecture (src/reporting/evidence_registry.py, ADR-012/ADR-013) is NOT hardcoded to Apple and Microsoft -- it is the third, independently-added real company's evidence, added by dropping a new fixture file into tests/fixtures/, not by editing a Python dict. `category` is a deterministic keyword-rule tag (src/ingestion/risk_categorizer.py) applied automatically, not hand-picked per chunk.",
+  "cik": "0001045810",
+  "entity_name": "NVIDIA Corporation",
+  "fiscal_year": 2025,
+  "accession_number": "0001045810-25-000023",
+  "source_document_url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000023/nvda-20250126.htm",
+  "chunks": [
+    {
+      "chunk_id": "nvda-2025-rf-1",
+      "heading": "Competition could adversely impact our market share and financial results",
+      "text": "Our target markets remain competitive, and competition may intensify with expanding and changing product and service offerings, industry standards, customer and market needs, new entrants and consolidations."
+    },
+    {
+      "chunk_id": "nvda-2025-rf-2",
+      "heading": "Long manufacturing lead times and uncertain supply and component availability",
+      "text": "We have long manufacturing lead times and build finished products and maintain inventory in advance of anticipated demand. In periods of shortages impacting the semiconductor industry and/or limited supply or capacity in our supply chain, the lead times for certain supply may be extended."
+    },
+    {
+      "chunk_id": "nvda-2025-rf-3",
+      "heading": "Dependency on third-party suppliers and their technology",
+      "text": "We depend on foundries to manufacture our semiconductor wafers using their fabrication equipment and techniques. We do not assemble, test, or package our products, but instead contract with independent subcontractors."
+    },
+    {
+      "chunk_id": "nvda-2025-rf-4",
+      "heading": "Product, system security and data breaches and cyber-attacks",
+      "text": "Security breaches, computer malware, social-engineering attacks, denial-of-service attacks, software bugs, server malfunctions, software or hardware failures, loss of data or other information technology assets, and other cyber-attacks are becoming increasingly sophisticated."
+    },
+    {
+      "chunk_id": "nvda-2025-rf-5",
+      "heading": "We are subject to complex laws, rules, regulations, including restrictions on export",
+      "text": "Given the increasing strategic importance of AI and rising geopolitical tensions, the USG has changed and may again change the export control rules at any time and further subject a wider range of our products to export restrictions."
+    },
+    {
+      "chunk_id": "nvda-2025-rf-6",
+      "heading": "A significant amount of our revenue stems from a limited number of partners",
+      "text": "A significant amount of our revenue stems from a limited number of partners and distributors and we have a concentration of sales to customers, and our revenue could be adversely affected if we lose or are prevented from selling to any of these end customers."
+    }
+  ]
+}

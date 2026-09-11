@@ -1,0 +1,50 @@
+{
+  "_provenance": "Extracted from the real, live text of Apple Inc.'s FY2025 10-K, Item 1A (Risk Factors), fetched from https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927.htm on 2026-09-08. Accession 0000320193-25-000079, filed 2025-10-31. This is real filing text, not synthetic — used to demonstrate genuine retrieval (src/retrieval/tfidf_index.py) without requiring a live network call or any LLM during automated tests.",
+  "cik": "0000320193",
+  "entity_name": "Apple Inc.",
+  "fiscal_year": 2025,
+  "accession_number": "0000320193-25-000079",
+  "source_document_url": "https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927.htm",
+  "chunks": [
+    {
+      "chunk_id": "aapl-2025-rf-1",
+      "heading": "Macroeconomic and Industry Risks",
+      "text": "Adverse macroeconomic conditions, including slow growth or recession, high unemployment, inflation, tighter credit, higher interest rates, and currency fluctuations, can adversely impact consumer confidence and spending and materially adversely affect demand for the Company's products and services."
+    },
+    {
+      "chunk_id": "aapl-2025-rf-2",
+      "heading": "Geopolitical and Trade Disruption Risks",
+      "text": "Restrictions on international trade, such as tariffs and other controls on imports or exports of goods, technology or data, can materially adversely affect the Company's business and supply chain. New U.S. tariffs announced in 2025 and potential retaliatory measures create uncertainty regarding the Company's operations."
+    },
+    {
+      "chunk_id": "aapl-2025-rf-3",
+      "heading": "Competitive Market Pressures",
+      "text": "The Company has a minority market share in the global smartphone, personal computer, tablet and wearables markets, and some of the markets in which the Company competes have from time to time experienced little to no growth or contracted overall."
+    },
+    {
+      "chunk_id": "aapl-2025-rf-4",
+      "heading": "Product Development and Innovation Challenges",
+      "text": "The Company's ability to compete successfully depends heavily on ensuring the continuing and timely introduction of innovative new products, services and technologies to the marketplace. Failure to develop compelling new offerings could materially harm the Company's competitive positioning."
+    },
+    {
+      "chunk_id": "aapl-2025-rf-5",
+      "heading": "Supply Chain Dependencies",
+      "text": "Because the Company currently obtains certain components from single or limited sources, the Company is subject to significant supply and pricing risks. Custom components available from only one source create vulnerability during periods of capacity constraints."
+    },
+    {
+      "chunk_id": "aapl-2025-rf-6",
+      "heading": "Intellectual Property and Licensing Risks",
+      "text": "The Company relies on access to third-party intellectual property, which may not be available to the Company on commercially reasonable terms, or at all. Failure to obtain necessary licenses could require product modifications or discontinuation."
+    },
+    {
+      "chunk_id": "aapl-2025-rf-7",
+      "heading": "Data Security and Privacy Risks",
+      "text": "Losses or unauthorized access to or releases of confidential information, including personal information, could subject the Company to significant reputational, financial, legal and operational consequences. The Company experiences malicious attacks regularly that target confidential data."
+    },
+    {
+      "chunk_id": "aapl-2025-rf-8",
+      "heading": "Regulatory Compliance Complexity",
+      "text": "The Company is subject to complex and changing laws and regulations worldwide, including antitrust, privacy, data security, product liability, and numerous other areas, creating substantial compliance costs and operational constraints."
+    }
+  ]
+}

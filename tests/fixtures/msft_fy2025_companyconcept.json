@@ -1,0 +1,492 @@
+{
+  "_provenance": "Real values fetched live from data.sec.gov on 2026-09-08 for CIK 0000789019 (Microsoft Corporation). Covers three real, filed fiscal years: FY2023 10-K (accession 0000950170-23-035122, filed 2023-07-27, period end 2023-06-30), FY2024 10-K (accession 0000950170-24-087843, filed 2024-07-30, period end 2024-06-30), and FY2025 10-K (accession 0000950170-25-100235, filed 2025-07-30, period end 2025-06-30). FY2025's LongTermDebtNoncurrent/LongTermDebt are deliberately absent for fy=2025 under the FY2025 10-K's own accession \u2014 this reflects a REAL, confirmed gap (the only fy=2025-tagged long-term-debt value data.sec.gov returns comes from the later FY2026 10-K's comparative column, accession 0001193125-26-323660, which is not the FY2025 filing itself), used to test honest missing-data handling exactly like the Apple retained-earnings case in Phase 1. InventoryNet and PaymentsToAcquirePropertyPlantAndEquipment added 2026-09-10 for FY2023-FY2025, real values fetched live from data.sec.gov for the same CIK/accessions above. InterestExpense added the same day for FY2023-FY2024 only: data.sec.gov genuinely has no InterestExpense value tagged against Microsoft's FY2025 10-K accession (0000950170-25-100235) -- confirmed by checking that accession number does not appear anywhere in the real InterestExpense concept series at all -- a real reporting change, not a fixture omission, and interest coverage must therefore honestly show 'insufficient data' for Microsoft FY2025.",
+  "Assets": {
+    "units": {
+      "USD": [
+        {
+          "end": "2025-06-28",
+          "val": 331495000000,
+          "accn": "0000320193-25-000073",
+          "fy": 2025,
+          "fp": "Q3",
+          "form": "10-Q",
+          "filed": "2025-08-01"
+        },
+        {
+          "end": "2023-06-30",
+          "val": 411976000000,
+          "accn": "0000950170-23-035122",
+          "fy": 2023,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2023-07-27"
+        },
+        {
+          "end": "2024-06-30",
+          "val": 512163000000,
+          "accn": "0000950170-24-087843",
+          "fy": 2024,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2024-07-30"
+        },
+        {
+          "end": "2025-06-30",
+          "val": 619003000000,
+          "accn": "0000950170-25-100235",
+          "fy": 2025,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2025-07-30"
+        }
+      ]
+    }
+  },
+  "Liabilities": {
+    "units": {
+      "USD": [
+        {
+          "end": "2025-06-30",
+          "val": 275524000000,
+          "accn": "0000950170-25-100235",
+          "fy": 2025,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2025-07-30"
+        }
+      ]
+    }
+  },
+  "AssetsCurrent": {
+    "units": {
+      "USD": [
+        {
+          "end": "2023-06-30",
+          "val": 184257000000,
+          "accn": "0000950170-23-035122",
+          "fy": 2023,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2023-07-27"
+        },
+        {
+          "end": "2024-06-30",
+          "val": 159734000000,
+          "accn": "0000950170-24-087843",
+          "fy": 2024,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2024-07-30"
+        },
+        {
+          "end": "2025-06-30",
+          "val": 191131000000,
+          "accn": "0000950170-25-100235",
+          "fy": 2025,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2025-07-30"
+        }
+      ]
+    }
+  },
+  "LiabilitiesCurrent": {
+    "units": {
+      "USD": [
+        {
+          "end": "2023-06-30",
+          "val": 104149000000,
+          "accn": "0000950170-23-035122",
+          "fy": 2023,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2023-07-27"
+        },
+        {
+          "end": "2024-06-30",
+          "val": 125286000000,
+          "accn": "0000950170-24-087843",
+          "fy": 2024,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2024-07-30"
+        },
+        {
+          "end": "2025-06-30",
+          "val": 141218000000,
+          "accn": "0000950170-25-100235",
+          "fy": 2025,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2025-07-30"
+        }
+      ]
+    }
+  },
+  "RetainedEarningsAccumulatedDeficit": {
+    "units": {
+      "USD": [
+        {
+          "end": "2025-06-30",
+          "val": 237731000000,
+          "accn": "0000950170-25-100235",
+          "fy": 2025,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2025-07-30"
+        }
+      ]
+    }
+  },
+  "OperatingIncomeLoss": {
+    "units": {
+      "USD": [
+        {
+          "start": "2024-07-01",
+          "end": "2025-06-30",
+          "val": 128528000000,
+          "accn": "0000950170-25-100235",
+          "fy": 2025,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2025-07-30"
+        }
+      ]
+    }
+  },
+  "RevenueFromContractWithCustomerExcludingAssessedTax": {
+    "units": {
+      "USD": [
+        {
+          "start": "2022-07-01",
+          "end": "2023-06-30",
+          "val": 211915000000,
+          "accn": "0000950170-23-035122",
+          "fy": 2023,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2023-07-27"
+        },
+        {
+          "start": "2023-07-01",
+          "end": "2024-06-30",
+          "val": 245122000000,
+          "accn": "0000950170-24-087843",
+          "fy": 2024,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2024-07-30"
+        },
+        {
+          "start": "2024-07-01",
+          "end": "2025-06-30",
+          "val": 281724000000,
+          "accn": "0000950170-25-100235",
+          "fy": 2025,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2025-07-30"
+        }
+      ]
+    }
+  },
+  "StockholdersEquity": {
+    "units": {
+      "USD": [
+        {
+          "end": "2025-06-30",
+          "val": 343479000000,
+          "accn": "0000950170-25-100235",
+          "fy": 2025,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2025-07-30"
+        }
+      ]
+    }
+  },
+  "NetIncomeLoss": {
+    "units": {
+      "USD": [
+        {
+          "start": "2022-07-01",
+          "end": "2023-06-30",
+          "val": 72361000000,
+          "accn": "0000950170-23-035122",
+          "fy": 2023,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2023-07-27"
+        },
+        {
+          "start": "2023-07-01",
+          "end": "2024-06-30",
+          "val": 88136000000,
+          "accn": "0000950170-24-087843",
+          "fy": 2024,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2024-07-30"
+        },
+        {
+          "start": "2024-07-01",
+          "end": "2025-06-30",
+          "val": 101832000000,
+          "accn": "0000950170-25-100235",
+          "fy": 2025,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2025-07-30"
+        }
+      ]
+    }
+  },
+  "NetCashProvidedByUsedInOperatingActivities": {
+    "units": {
+      "USD": [
+        {
+          "start": "2022-07-01",
+          "end": "2023-06-30",
+          "val": 87582000000,
+          "accn": "0000950170-23-035122",
+          "fy": 2023,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2023-07-27"
+        },
+        {
+          "start": "2023-07-01",
+          "end": "2024-06-30",
+          "val": 118548000000,
+          "accn": "0000950170-24-087843",
+          "fy": 2024,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2024-07-30"
+        },
+        {
+          "start": "2024-07-01",
+          "end": "2025-06-30",
+          "val": 136162000000,
+          "accn": "0000950170-25-100235",
+          "fy": 2025,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2025-07-30"
+        }
+      ]
+    }
+  },
+  "LongTermDebtNoncurrent": {
+    "units": {
+      "USD": [
+        {
+          "end": "2023-06-30",
+          "val": 41990000000,
+          "accn": "0000950170-23-035122",
+          "fy": 2023,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2023-07-27"
+        },
+        {
+          "end": "2024-06-30",
+          "val": 42688000000,
+          "accn": "0000950170-24-087843",
+          "fy": 2024,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2024-07-30"
+        },
+        {
+          "end": "2025-06-30",
+          "val": 40152000000,
+          "accn": "0001193125-26-323660",
+          "fy": 2026,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2026-07-29"
+        }
+      ]
+    }
+  },
+  "LongTermDebt": {
+    "units": {
+      "USD": [
+        {
+          "end": "2025-06-30",
+          "val": 43151000000,
+          "accn": "0001193125-26-323660",
+          "fy": 2026,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2026-07-29"
+        }
+      ]
+    }
+  },
+  "CommonStockSharesOutstanding": {
+    "units": {
+      "shares": [
+        {
+          "end": "2023-06-30",
+          "val": 7432000000,
+          "accn": "0000950170-23-035122",
+          "fy": 2023,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2023-07-27"
+        },
+        {
+          "end": "2024-06-30",
+          "val": 7434000000,
+          "accn": "0000950170-24-087843",
+          "fy": 2024,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2024-07-30"
+        },
+        {
+          "end": "2025-06-30",
+          "val": 7434000000,
+          "accn": "0000950170-25-100235",
+          "fy": 2025,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2025-07-30"
+        }
+      ]
+    }
+  },
+  "CostOfGoodsAndServicesSold": {
+    "units": {
+      "USD": [
+        {
+          "start": "2022-07-01",
+          "end": "2023-06-30",
+          "val": 65863000000,
+          "accn": "0000950170-23-035122",
+          "fy": 2023,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2023-07-27"
+        },
+        {
+          "start": "2023-07-01",
+          "end": "2024-06-30",
+          "val": 74114000000,
+          "accn": "0000950170-24-087843",
+          "fy": 2024,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2024-07-30"
+        },
+        {
+          "start": "2024-07-01",
+          "end": "2025-06-30",
+          "val": 87831000000,
+          "accn": "0000950170-25-100235",
+          "fy": 2025,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2025-07-30"
+        }
+      ]
+    }
+  },
+  "InventoryNet": {
+    "units": {
+      "USD": [
+        {
+          "end": "2023-06-30",
+          "val": 2500000000,
+          "accn": "0000950170-23-035122",
+          "fy": 2023,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2023-07-27"
+        },
+        {
+          "end": "2024-06-30",
+          "val": 1246000000,
+          "accn": "0000950170-24-087843",
+          "fy": 2024,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2024-07-30"
+        },
+        {
+          "end": "2025-06-30",
+          "val": 938000000,
+          "accn": "0000950170-25-100235",
+          "fy": 2025,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2025-07-30"
+        }
+      ]
+    }
+  },
+  "InterestExpense": {
+    "units": {
+      "USD": [
+        {
+          "start": "2022-07-01",
+          "end": "2023-06-30",
+          "val": 1968000000,
+          "accn": "0000950170-23-035122",
+          "fy": 2023,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2023-07-27"
+        },
+        {
+          "start": "2023-07-01",
+          "end": "2024-06-30",
+          "val": 2935000000,
+          "accn": "0000950170-24-087843",
+          "fy": 2024,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2024-07-30"
+        }
+      ]
+    }
+  },
+  "PaymentsToAcquirePropertyPlantAndEquipment": {
+    "units": {
+      "USD": [
+        {
+          "start": "2022-07-01",
+          "end": "2023-06-30",
+          "val": 28107000000,
+          "accn": "0000950170-23-035122",
+          "fy": 2023,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2023-07-27"
+        },
+        {
+          "start": "2023-07-01",
+          "end": "2024-06-30",
+          "val": 44477000000,
+          "accn": "0000950170-24-087843",
+          "fy": 2024,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2024-07-30"
+        },
+        {
+          "start": "2024-07-01",
+          "end": "2025-06-30",
+          "val": 64551000000,
+          "accn": "0000950170-25-100235",
+          "fy": 2025,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2025-07-30"
+        }
+      ]
+    }
+  }
+}

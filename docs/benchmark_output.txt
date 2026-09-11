@@ -1,0 +1,34 @@
+=== RiskCopilot Phase 5 Performance Benchmark ===
+Machine: x86_64, Linux 6.18.44-fc-v24, Python 3.11.15
+Date: 2026-09-08 (this run's actual date/machine — re-run on your own
+laptop for numbers that reflect your own hardware; see this script's
+module docstring for exactly what is and is not measured here.)
+
+Snapshot assembly (parse real fixture JSON -> FinancialSnapshot):
+  n=200  mean=0.075ms  stdev=0.011ms  min=0.069ms  max=0.140ms
+Altman Z'-Score computation (pure arithmetic on an assembled snapshot):
+  n=200  mean=0.011ms  stdev=0.005ms  min=0.010ms  max=0.062ms
+Piotroski F-Score computation (9 signals, two snapshots):
+  n=200  mean=0.020ms  stdev=0.006ms  min=0.018ms  max=0.088ms
+
+TF-IDF index build (8 real Apple 10-K risk-factor chunks):
+  n=50  mean=1.828ms  stdev=0.435ms  min=1.444ms  max=3.404ms
+TF-IDF query (already-built index):
+  n=200  mean=1.045ms  stdev=0.118ms  min=0.919ms  max=2.372ms
+
+SQLite write (snapshot + Altman result, INSERT OR REPLACE):
+  n=100  mean=1.764ms  stdev=0.489ms  min=1.389ms  max=5.828ms
+SQLite read (SELECT all Altman scores):
+  n=100  mean=0.107ms  stdev=0.021ms  min=0.089ms  max=0.202ms
+
+--- Interpretation ---
+All measured operations complete in low-single-digit milliseconds or
+less on this sandbox machine. Even a laptop 10-20x slower on raw CPU
+would keep every one of these steps well under 100ms — none of them
+involve a loop over a large dataset or an expensive algorithm; the
+actual end-to-end latency of a real run is dominated by network round
+trips to data.sec.gov/api.stlouisfed.org (not measurable from this
+sandbox) and, when used, the LLM API call (also not measured here —
+no live LLM call has been made anywhere in this project). This is the
+honest scope of what local compute-bound benchmarking can tell us for
+a tool whose real bottleneck is expected to be network I/O, not CPU.

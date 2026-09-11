@@ -1,0 +1,39 @@
+# RiskCopilot — dependencies
+#
+# Versions below reflect what is actually installed and tested in this
+# project's venv (see `pip freeze` in docs/07_security_review.md's
+# dependency-scan section for the full, exact resolved set). Ranges are used
+# instead of exact pins so the project keeps working as patch releases ship,
+# while the lower bounds are set to versions verified vulnerability-free by
+# `pip-audit` on 2026-09-08 (see docs/07_security_review.md).
+
+# --- Phase 1: data ingestion + deterministic financial analysis ---
+requests>=2.32,<3.0
+pydantic>=2.6,<3.0
+python-dotenv>=1.0,<2.0
+
+# --- Phase 3: retrieval (TF-IDF, ADR-010) ---
+scikit-learn>=1.5,<2.0
+numpy>=1.26,<3.0
+scipy>=1.11,<2.0
+
+# --- Phase 6: dashboard ---
+streamlit>=1.36,<2.0
+
+# --- Testing ---
+# pytest>=9.0.3 fixes PYSEC-2026-1845 (see docs/07_security_review.md).
+pytest>=9.0.3,<10.0
+pytest-cov>=5.0,<6.0
+
+# --- Phase 3 real LLM narrative generation (ADR-011) ---
+# OllamaLLMClient (the default real backend) needs no extra package — it
+# talks to a local Ollama server over plain HTTP using `requests` (already
+# listed above). Install Ollama itself separately: https://ollama.com
+
+# --- Optional alternative LLM backend, NOT used by default ---
+# Only needed if you construct AnthropicLLMClient yourself instead of the
+# default OllamaLLMClient (src/agentic/llm_client.py).
+# anthropic>=0.34
+
+# --- Dev tooling (not required to run the app) ---
+# pip-audit>=2.7   # dependency vulnerability scanning, see docs/07_security_review.md
