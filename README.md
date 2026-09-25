@@ -81,7 +81,7 @@ The dashed line running through this diagram is the one that matters: everything
 ![RiskCopilot Historical Validation](docs/images/historical_validation.png)
 ## Historical Validation
 
-The Altman Z'-Score model was backtested against real corporate bankruptcies (Bed Bath & Beyond, Party City) using pre-event filing snapshots. It correctly flagged 3 of 4 snapshots as grey-zone or distressed ahead of the actual bankruptcy filing. This is an honest, small-sample result (N=2 companies), not a statistically powered accuracy claim, and the full methodology and its limitations are documented rather than glossed over.
+The Altman Z'-Score model was backtested against real corporate bankruptcies (Bed Bath & Beyond, Party City) using their annual 10-K filings. Counting only the filings that were actually public before each bankruptcy petition, it flagged **1 of 2** in advance (Party City, about a year early) and missed 1 (Bed Bath & Beyond, which scored just inside the safe zone). The two companies' final 10-Ks were filed after their bankruptcy petitions, so they are not counted as predictions. This is an honest, small-sample result (N=2 companies), not a statistically powered accuracy claim, and the full methodology and its limitations are documented rather than glossed over.
 
 ## Data Integrity Guarantees
 

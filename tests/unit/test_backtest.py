@@ -59,9 +59,35 @@ def test_party_city_caught_with_real_lead_time_at_both_points(backtest_cases):
 def test_summary_aggregates_honestly(backtest_cases):
     summary = run_backtest(backtest_cases)
     assert summary.total_snapshots == 4
-    # 3 of 4 real pre-bankruptcy snapshots were flagged (grey or distress);
-    # exactly 1 (BBBY one year out) was a genuine miss.
+    # Across ALL 4 snapshots (including 2 filed after the petition), 3 land
+    # in grey/distress. This is supporting detail, NOT the prediction rate —
+    # see test_only_filings_public_before_the_event_count_as_predictions.
     assert summary.flagged_count == 3
     assert summary.missed_count == 1
     assert summary.strong_signal_count == 3  # all 3 flags were distress-zone, not just grey
     assert summary.flagged_rate == pytest.approx(0.75)
+
+
+def test_only_filings_public_before_the_event_count_as_predictions(backtest_cases):
+    """Regression test for an overstated headline claim ("3 of 4 flagged
+    ahead of bankruptcy"). BBBY FY2022 (filed 2023-06-14) and Party City
+    FY2022 (filed 2024-03-28) were both filed AFTER their Chapter 11
+    petitions, so they could never have warned anyone in advance. Only the
+    two FY2021 filings count as predictions: Party City flagged, BBBY
+    missed. Correct result: 1 of 2."""
+    summary = run_backtest(backtest_cases)
+    assert summary.predictive_snapshots == 2
+    assert summary.predictive_flagged_count == 1
+    assert summary.predictive_missed_count == 1
+    assert summary.predictive_flagged_rate == pytest.approx(0.5)
+
+    predictive = [
+        (c.company_name, s.fiscal_year)
+        for c in summary.cases
+        for s in c.snapshots
+        if s.filed_before_event
+    ]
+    assert sorted(predictive) == [
+        ("Bed Bath & Beyond Inc.", 2021),
+        ("Party City Holdco Inc.", 2021),
+    ]

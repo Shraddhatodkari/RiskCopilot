@@ -551,9 +551,19 @@ with tab_backtest:
         summary = run_backtest(cases)
 
         m1, m2, m3 = st.columns(3)
-        m1.metric("Pre-event snapshots evaluated", summary.total_snapshots)
-        m2.metric("Flagged (grey or distress)", f"{summary.flagged_count} ({summary.flagged_rate:.0%})")
-        m3.metric("Missed (safe zone)", summary.missed_count)
+        m1.metric("Snapshots filed BEFORE bankruptcy (real predictions)", summary.predictive_snapshots)
+        m2.metric(
+            "Flagged in advance (grey or distress)",
+            f"{summary.predictive_flagged_count} of {summary.predictive_snapshots} "
+            f"({summary.predictive_flagged_rate:.0%})",
+        )
+        m3.metric("Missed in advance (safe zone)", summary.predictive_missed_count)
+        st.caption(
+            f"Only filings that were public before the bankruptcy petition count as predictions. "
+            f"{summary.total_snapshots - summary.predictive_snapshots} of the {summary.total_snapshots} "
+            f"snapshots below were filed after the company had already filed for bankruptcy, so they "
+            f"are shown for completeness but not counted as advance warnings."
+        )
 
         for case in summary.cases:
             st.write(f"### {case.company_name} — {case.known_event} ({case.known_event_date})")
@@ -566,7 +576,7 @@ with tab_backtest:
                     f"lead time {s.lead_time_days} days | {flag_note}"
                 )
         st.info(
-            "Honest N=2 company, 4-snapshot backtest — not a statistically powered accuracy "
+            "Honest N=2 company backtest (2 real advance-warning snapshots) — not a statistically powered accuracy "
             "claim. See docs/06_historical_backtest.md for the full discussion."
         )
     else:

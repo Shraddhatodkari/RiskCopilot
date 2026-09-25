@@ -55,21 +55,29 @@ own methodology.
 | Party City | 2021 | 2021-12-31 | 2022-02-28 (before) | 382 days early | 0.76 | **Distress** | Flagged |
 | Party City | 2022 | 2022-12-31 | 2024-03-28 (**after**) | 17 days early | -1.48 | **Distress** | Flagged |
 
-**3 of 4 real pre-event snapshots (75%) were flagged** as grey-or-distress
-zone; all 3 flags were the strongest ("distress") classification, not a
-borderline "grey" call. **1 of 4 was a genuine miss**: Bed Bath & Beyond's
-FY2021 10-K, filed about 14 months before the actual bankruptcy, scored
-2.93 — just barely in the "safe" zone.
+**Headline result: 1 of 2 real advance-warning snapshots was flagged.**
 
-Two real filing-timing facts worth noting for interview defensibility:
-first, both companies' *final* pre-bankruptcy 10-K was actually filed
-*after* their Chapter 11 petition date (companies in acute distress
-routinely delay financial reporting) — the period the filing *covers* is
-still pre-petition, but a real production deployment could not have relied
-on that specific filing to warn an analyst in advance, only earlier ones.
-Second, Party City's earlier (FY2021) filing genuinely was available well
-in advance (382 days) and correctly flagged distress — a real example of
-useful lead time this system can provide.
+Only a filing that was public *before* the bankruptcy petition can count
+as a prediction. Two of the four snapshots above (BBBY FY2022, filed
+2023-06-14, and Party City FY2022, filed 2024-03-28) were filed *after*
+their company's Chapter 11 petition (companies in acute distress routinely
+delay financial reporting). The period those filings cover is
+pre-petition, but no analyst could have used them as an early warning, so
+they are excluded from the prediction count.
+
+Of the two snapshots that were genuinely available in advance:
+
+- **Party City FY2021** (filed 2022-02-28, 323 days before the petition)
+  scored 0.76, **distress zone: flagged**. A real example of useful lead
+  time.
+- **Bed Bath & Beyond FY2021** (filed 2022-04-21, 367 days before the
+  petition) scored 2.93, just inside the **safe zone: missed**.
+
+For completeness only: the two after-the-fact filings both also scored in
+the distress zone, so across all four snapshots 3 of 4 land in grey or
+distress. An earlier version of this document (and the README) reported
+that 3-of-4 figure as if it were a prediction rate; it is not, and has
+been corrected to 1 of 2.
 
 ## Why the miss happened (a real, investigated limitation, not hand-waved)
 
@@ -92,7 +100,7 @@ design (ADR-006).
 
 ## Limitations of this backtest itself
 
-- N=2 companies, 4 snapshots — far too small to claim a general accuracy
+- N=2 companies, 4 snapshots of which only 2 were filed before the event — far too small to claim a general accuracy
   rate. It demonstrates the evaluation *methodology* works and produces
   one real, honest, mixed result; it does not establish a validated hit
   rate.

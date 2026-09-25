@@ -71,9 +71,24 @@ class BacktestSummary(BaseModel):
     strong_signal_count: int
     missed_count: int  # zone == safe
 
+    # Only snapshots whose 10-K was actually public BEFORE the bankruptcy
+    # petition can count as a prediction: a filing that appeared after the
+    # event could never have warned anyone in advance, even if the period
+    # it covers is pre-petition. These fields are the honest headline
+    # result; the all-snapshot counts above are supporting detail only.
+    predictive_snapshots: int = 0
+    predictive_flagged_count: int = 0
+    predictive_missed_count: int = 0
+
     @property
     def flagged_rate(self) -> float:
         return self.flagged_count / self.total_snapshots if self.total_snapshots else 0.0
+
+    @property
+    def predictive_flagged_rate(self) -> float:
+        if not self.predictive_snapshots:
+            return 0.0
+        return self.predictive_flagged_count / self.predictive_snapshots
 
 
 def _build_snapshot(cik: str, entity_name: str, record: dict) -> FinancialSnapshot:
@@ -146,10 +161,14 @@ def evaluate_case(case: dict) -> CaseResult:
 def run_backtest(cases: list[dict]) -> BacktestSummary:
     case_results = [evaluate_case(c) for c in cases]
     all_snapshots = [s for c in case_results for s in c.snapshots]
+    predictive = [s for s in all_snapshots if s.filed_before_event]
     return BacktestSummary(
         cases=case_results,
         total_snapshots=len(all_snapshots),
         flagged_count=sum(1 for s in all_snapshots if s.flagged_for_review),
         strong_signal_count=sum(1 for s in all_snapshots if s.strong_signal),
         missed_count=sum(1 for s in all_snapshots if not s.flagged_for_review),
+        predictive_snapshots=len(predictive),
+        predictive_flagged_count=sum(1 for s in predictive if s.flagged_for_review),
+        predictive_missed_count=sum(1 for s in predictive if not s.flagged_for_review),
     )
