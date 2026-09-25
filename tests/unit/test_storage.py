@@ -120,8 +120,8 @@ def test_data_quality_issues_are_persisted(aapl_client):
 
     issues = get_data_quality_issues(conn, "0000320193", 2025)
     concepts = {i["concept"] for i in issues}
-    assert "retained_earnings" in concepts
-    assert "stockholders_equity" in concepts
+    # Apple's one real FY2025 gap (no InterestExpense tagged in its 10-K).
+    assert concepts == {"interest_expense"}
     conn.close()
 
 

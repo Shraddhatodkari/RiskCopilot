@@ -111,8 +111,8 @@ def build_company_dossier(conn: sqlite3.Connection, cik: str, entity_name: str) 
 
     # Deliberately NOT derived only from latest_altman/latest_piotroski:
     # a company can have a real, honestly-ingested fiscal year with real
-    # data-quality issues and NO computable score at all (e.g. Apple
-    # FY2025 in this project's own seed data). That year must still be
+    # data-quality issues and NO computable score at all (e.g. a year
+    # whose filing is missing retained_earnings). That year must still be
     # "current" for data-quality/facts display purposes — see
     # get_latest_known_fiscal_year's own docstring.
     current_fy = get_latest_known_fiscal_year(conn, cik)

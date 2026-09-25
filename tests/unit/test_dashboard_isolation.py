@@ -102,31 +102,27 @@ def test_agentic_tab_metrics_and_evidence_are_the_selected_companys_own():
     assert "aapl-2025-rf" not in nvda_agentic
 
 
-def test_apple_agentic_tab_never_presents_a_different_fiscal_years_score_as_current():
-    """Apple's seeded FY2025 filing genuinely has no computable Altman Z'
-    (a real, honestly-reported data-quality gap — no clean
-    StockholdersEquity/RetainedEarningsAccumulatedDeficit fact — see
-    ADR-012/013 and test_storage.py), so the most recent STORED Altman
-    result is FY2024's, while Piotroski's most recent stored result is the
-    real FY2025 one. `get_latest_altman`/`get_latest_piotroski` deliberately
-    return the latest score each independently has (see their own
-    docstrings) — the failure mode this test guards against is the
-    dashboard silently presenting FY2024's Altman number as if it were a
-    current FY2025 result. Each metric must carry its own real,
-    independently-correct fiscal year in the text shown to the model."""
+def test_apple_agentic_tab_uses_the_real_fy2025_altman_not_the_stale_fy2024_one():
+    """Apple's FY2025 Altman Z' was previously uncomputable only because the
+    seed fixture was missing two FY2025 entries, so the dashboard fell back
+    to the FY2024 score (2.1054). With the fixture corrected, the latest
+    stored Altman is the real FY2025 one (2.3464, grey), and the metrics
+    handed to the model must carry that score and its own fiscal year —
+    never the FY2024 figure. Requires a DB seeded after the fixture fix."""
     at = _run_dashboard()
     at.selectbox[0].set_value("Apple Inc.").run(timeout=30)
     assert not at.exception
     apple_agentic_text = " ".join(m.value for m in at.tabs[5].markdown)
     assert "altman_z_score" in apple_agentic_text
-    assert "FY2024" in apple_agentic_text  # Altman's real, stored fiscal year
+    assert "2.35 (grey zone, FY2025)" in apple_agentic_text  # 2.3464 at the prompt's 2dp
+    assert "2.11" not in apple_agentic_text  # the stale FY2024 score must not appear
     assert "piotroski_f_score" in apple_agentic_text
-    assert "FY2025" in apple_agentic_text  # Piotroski's real, stored fiscal year
+    assert "8/9 (FY2025)" in apple_agentic_text
 
 
 def test_dashboard_source_still_guards_against_a_totally_missing_score():
     """Now that Apple's seeded data genuinely has a real stored Piotroski
-    score (FY2025) and a real stored Altman score (FY2024), no company in
+    score (FY2025) and a real stored Altman score (FY2025), no company in
     the current seeded database reaches dashboard.py's "no deterministic
     score is available" branch, so it can no longer be exercised through a
     real end-to-end AppTest run without monkeypatching Streamlit's own

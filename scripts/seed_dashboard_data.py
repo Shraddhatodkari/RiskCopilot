@@ -9,17 +9,15 @@ been independently verified elsewhere in this project:
     tests/fixtures/msft_fy2025_companyconcept.json, the same fixture
     tests/unit/test_altman_z.py and tests/unit/test_piotroski.py assert
     against with hand-verified expected values.
-  - AAPL Altman Z' (FY2023, FY2024) and Piotroski F (FY2024 vs FY2023,
-    FY2025 vs FY2024): from tests/fixtures/aapl_fy2025_companyconcept.json,
-    extended live on 2026-09-10 to cover all three fiscal years (matching
-    MSFT/NVIDIA) for historical-trend parity. FY2025 genuinely has no
-    clean StockholdersEquity or RetainedEarningsAccumulatedDeficit fact (a
-    real, documented data-quality issue — see
-    tests/unit/test_xbrl_facts.py::test_aapl_snapshot_flags_missing_retained_earnings_honestly),
-    so no Altman score is computed or stored for AAPL FY2025; the
-    resulting data quality issue IS stored, because the dashboard should
-    show that honestly rather than silently omitting AAPL. FY2023/FY2024
-    have no such gap and their Altman scores are stored normally.
+  - AAPL Altman Z' (FY2023, FY2024, FY2025) and Piotroski F (FY2024 vs
+    FY2023, FY2025 vs FY2024): from
+    tests/fixtures/aapl_fy2025_companyconcept.json, covering all three
+    fiscal years (matching MSFT/NVIDIA) for historical-trend parity. An
+    earlier version of that fixture was missing Apple's FY2025
+    StockholdersEquity and RetainedEarningsAccumulatedDeficit entries, so
+    FY2025 Altman was wrongly skipped as "insufficient data"; both were
+    re-verified live on 2026-09-25 and added (see
+    tests/unit/test_xbrl_facts.py::test_aapl_fy2025_extracts_stockholders_equity_and_retained_earnings).
   - The Phase 4 historical backtest cases (BBBY, Party City): from
     tests/fixtures/distress_backtest_cases.json, real SEC data with real
     bankruptcy outcomes.
@@ -94,9 +92,9 @@ def main() -> None:
         print(f"Saved MSFT FY2024 Piotroski F={f.f_score}/9 ({f.interpretation})")
 
         # --- Apple: FY2023-FY2025, matching MSFT/NVIDIA's 3-year coverage
-        # so historical trends have real, non-hardcoded data to show.
-        # FY2025 is genuinely incomplete (see this file's own docstring)
-        # and stored honestly as such — no Altman/Piotroski fabricated for it. ---
+        # so historical trends have real, non-hardcoded data to show. If a
+        # year is ever genuinely incomplete, InsufficientDataError is
+        # reported and nothing is fabricated or stored for it. ---
         aapl = _FixtureBackedClient("aapl_fy2025_companyconcept.json")
         aapl_fy2025 = build_financial_snapshot(aapl, "0000320193", "Apple Inc.", 2025)
         aapl_fy2024 = build_financial_snapshot(aapl, "0000320193", "Apple Inc.", 2024)
@@ -105,10 +103,13 @@ def main() -> None:
             save_snapshot(conn, snap)
 
         try:
-            compute_altman_z_prime(aapl_fy2025)
+            az25 = compute_altman_z_prime(aapl_fy2025)
         except InsufficientDataError as exc:
             print(f"AAPL FY2025: no Altman score computed (InsufficientDataError: {exc}) "
                   f"— stored as a data quality issue instead, not silently skipped.")
+        else:
+            save_altman_result(conn, az25)
+            print(f"Saved AAPL FY2025 Altman Z'={az25.z_score:.4f} ({az25.zone.value})")
 
         az24 = compute_altman_z_prime(aapl_fy2024)
         save_altman_result(conn, az24)

@@ -38,6 +38,29 @@ def aapl_client() -> FixtureBackedClient:
     return FixtureBackedClient("aapl_fy2025_companyconcept.json")
 
 
+class TagHidingClient(FixtureBackedClient):
+    """A real fixture with specific tags deliberately removed, so a tag
+    lookup raises SecEdgarNotFound exactly as a live 404 would. Used ONLY to
+    exercise the missing-data code paths (refuse to fabricate, report the
+    gap) now that no real company fixture happens to lack an Altman input.
+    Every value that remains is still genuine SEC data."""
+
+    def __init__(self, fixture_name: str, hidden_tags: tuple[str, ...]):
+        super().__init__(fixture_name)
+        for tag in hidden_tags:
+            self._data.pop(tag, None)
+
+
+APPLE_EQUITY_TAGS = ("RetainedEarningsAccumulatedDeficit", "StockholdersEquity")
+
+
+@pytest.fixture
+def aapl_client_missing_equity_tags() -> FixtureBackedClient:
+    """Real Apple data with RetainedEarningsAccumulatedDeficit and
+    StockholdersEquity deliberately hidden — see TagHidingClient."""
+    return TagHidingClient("aapl_fy2025_companyconcept.json", APPLE_EQUITY_TAGS)
+
+
 @pytest.fixture
 def msft_client() -> FixtureBackedClient:
     return FixtureBackedClient("msft_fy2025_companyconcept.json")

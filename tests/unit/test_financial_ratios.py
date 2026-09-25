@@ -9,6 +9,8 @@ test.
 """
 from __future__ import annotations
 
+import pytest
+
 from src.analysis.financial_ratios import RatioStatus, compute_financial_ratios
 from src.ingestion.xbrl_facts import build_financial_snapshot
 
@@ -78,21 +80,38 @@ def test_aapl_current_ratio_is_a_real_below_one_liquidity_signal(aapl_client):
     assert current_ratio.value < 1.0
 
 
-def test_aapl_equity_dependent_ratios_unavailable_because_stockholders_equity_is_missing(aapl_client):
-    """Apple's FY2025 10-K genuinely has no clean fy=2025
-    StockholdersEquity fact (confirmed live against data.sec.gov, same real
-    gap that blocks its Altman Z' — see tests/unit/test_xbrl_facts.py) and
-    no InterestExpense value at all for FY2025 — the ratios that depend on
-    those two concepts must say so explicitly. Net income, total assets,
-    and revenues ARE genuinely available for Apple FY2025 (added to this
-    fixture on 2026-09-10 to support Piotroski/multi-year trends), so the
-    ratios that only need those (return_on_assets, operating_margin,
-    net_margin) correctly compute rather than being wrongly marked
-    unavailable."""
+def test_aapl_fy2025_equity_ratios_compute_and_interest_coverage_is_honestly_missing(aapl_client):
+    """Apple's real FY2025 10-K reports StockholdersEquity (73,733M), so the
+    equity-dependent ratios compute. Expected values worked by hand from the
+    filed figures: debt_to_equity = 78,328M / 73,733M = 1.0623;
+    return_on_equity = 112,010M / 73,733M = 1.5191. Apple tags no
+    InterestExpense for FY2025, so interest_coverage must say so."""
     snapshot = build_financial_snapshot(aapl_client, "0000320193", "Apple Inc.", 2025)
     ratios = compute_financial_ratios(snapshot)
 
-    for name in ("debt_to_equity", "return_on_equity", "interest_coverage"):
+    assert ratios.get("debt_to_equity").status == RatioStatus.AVAILABLE
+    assert ratios.get("debt_to_equity").value == pytest.approx(1.0623, abs=1e-3)
+    assert ratios.get("return_on_equity").status == RatioStatus.AVAILABLE
+    assert ratios.get("return_on_equity").value == pytest.approx(1.5191, abs=1e-3)
+
+    ic = ratios.get("interest_coverage")
+    assert ic.status == RatioStatus.INSUFFICIENT_DATA
+    assert ic.value is None
+
+
+def test_equity_dependent_ratios_unavailable_when_stockholders_equity_is_missing(
+    aapl_client_missing_equity_tags,
+):
+    """If stockholders_equity is unavailable (here: real Apple data with the
+    tag deliberately hidden, see tests/conftest.py::TagHidingClient), the
+    ratios that need it must say so explicitly instead of computing from a
+    fabricated value, while ratios that don't need it still compute."""
+    snapshot = build_financial_snapshot(
+        aapl_client_missing_equity_tags, "0000320193", "Apple Inc.", 2025
+    )
+    ratios = compute_financial_ratios(snapshot)
+
+    for name in ("debt_to_equity", "return_on_equity"):
         r = ratios.get(name)
         assert r.status == RatioStatus.INSUFFICIENT_DATA
         assert r.value is None
@@ -102,13 +121,10 @@ def test_aapl_equity_dependent_ratios_unavailable_because_stockholders_equity_is
 
 
 def test_ratio_set_available_count_reflects_real_partial_data(msft_client, aapl_client):
-    """Both companies genuinely have exactly 3 of the 11 ratios
-    unavailable for FY2025 today — but for DIFFERENT real reasons (MSFT:
-    no long_term_debt or interest_expense tagged; Apple: no
-    stockholders_equity or interest_expense tagged). Equal counts here is
-    a real coincidence of two independently gappy real filings, not two
-    companies being treated identically — the specific missing concepts
-    (asserted in each company's own dedicated test above) differ."""
+    """The two companies' real FY2025 filings have DIFFERENT gaps. MSFT: no
+    long_term_debt or interest_expense tagged, so 3 of 11 ratios are
+    unavailable. Apple: only interest_expense is missing, so only
+    interest_coverage is unavailable (10 of 11)."""
     msft_snap = build_financial_snapshot(msft_client, "0000789019", "Microsoft Corporation", 2025)
     aapl_snap = build_financial_snapshot(aapl_client, "0000320193", "Apple Inc.", 2025)
 
@@ -116,7 +132,7 @@ def test_ratio_set_available_count_reflects_real_partial_data(msft_client, aapl_
     aapl_ratios = compute_financial_ratios(aapl_snap)
 
     assert msft_ratios.available_count == 8   # 11 total minus the 3 leverage ratios above
-    assert aapl_ratios.available_count == 8   # 11 total minus the 3 ratios above
+    assert aapl_ratios.available_count == 10  # 11 total minus interest_coverage
 
 
 def test_every_ratio_has_a_readable_formula_and_source_concepts(msft_client):

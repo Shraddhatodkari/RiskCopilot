@@ -19,7 +19,8 @@ MSFT_CIK = "0000789019"
 def _seed_both_companies(conn, aapl_client, msft_client):
     aapl_2025 = build_financial_snapshot(aapl_client, AAPL_CIK, "Apple Inc.", 2025)
     save_snapshot(conn, aapl_2025)
-    # AAPL FY2025 genuinely lacks retained_earnings — no Altman score, by design.
+    # Only Apple's snapshot is stored here (no score), so the tests can check
+    # that Apple's dossier never borrows Microsoft's stored Altman score.
 
     msft_2025 = build_financial_snapshot(msft_client, MSFT_CIK, "Microsoft Corporation", 2025)
     save_snapshot(conn, msft_2025)
@@ -43,7 +44,7 @@ def test_dossier_for_one_company_never_includes_another_companys_scores(aapl_cli
     msft_dossier = build_company_dossier(conn, MSFT_CIK, "Microsoft Corporation")
 
     assert aapl_dossier.cik == AAPL_CIK
-    assert aapl_dossier.latest_altman is None  # real, honest gap — not MSFT's score
+    assert aapl_dossier.latest_altman is None  # none stored for Apple — must not be MSFT's
     assert aapl_dossier.entity_name == "Apple Inc."
 
     assert msft_dossier.cik == MSFT_CIK
@@ -53,8 +54,11 @@ def test_dossier_for_one_company_never_includes_another_companys_scores(aapl_cli
 
     # The actual contamination bug this project fixed: verify explicitly
     # that AAPL's dossier data quality issues are AAPL's, not MSFT's.
+    # Apple's only real gap is interest_expense; long_term_debt is a
+    # Microsoft-only gap and must never appear in Apple's dossier.
     aapl_issue_concepts = {i["concept"] for i in aapl_dossier.data_quality_issues}
-    assert "retained_earnings" in aapl_issue_concepts
+    assert aapl_issue_concepts == {"interest_expense"}
+    assert "long_term_debt" not in aapl_issue_concepts
     conn.close()
 
 

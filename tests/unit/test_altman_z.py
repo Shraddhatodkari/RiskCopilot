@@ -96,20 +96,35 @@ def test_msft_real_filing_matches_independently_hand_computed_value(msft_client)
     assert result.is_complete
 
 
-def test_aapl_real_filing_raises_instead_of_fabricating(aapl_client):
-    """Apple's FY2025 filing is missing a clean retained_earnings fact (see
-    test_xbrl_facts.py). The scoring function must refuse to compute a
-    number rather than silently treating the missing value as zero — a
-    silent zero would corrupt X2 and understate/overstate risk without any
-    indication to the user."""
+def test_missing_retained_earnings_raises_instead_of_fabricating(aapl_client_missing_equity_tags):
+    """When retained_earnings is unavailable (here: real Apple data with
+    that tag deliberately hidden, see tests/conftest.py::TagHidingClient),
+    the scoring function must refuse to compute a number rather than
+    silently treating the missing value as zero — a silent zero would
+    corrupt X2 and understate/overstate risk without any indication."""
     snapshot = build_financial_snapshot(
-        aapl_client, cik="0000320193", entity_name="Apple Inc.", fiscal_year=2025
+        aapl_client_missing_equity_tags, cik="0000320193", entity_name="Apple Inc.", fiscal_year=2025
     )
 
     with pytest.raises(InsufficientDataError) as exc_info:
         compute_altman_z_prime(snapshot)
 
     assert "retained_earnings" in exc_info.value.missing_concepts
+
+
+def test_aapl_fy2025_real_filing_now_scores(aapl_client):
+    """With the corrected fixture, Apple's real FY2025 10-K has every Altman
+    input. Expected value computed independently by hand from the filed
+    figures (TA 359,241M; TL 285,508M; CA 147,957M; CL 165,631M; RE
+    -14,264M; EBIT 133,050M; Rev 416,161M; Equity 73,733M), not copied
+    from this code's output."""
+    snapshot = build_financial_snapshot(
+        aapl_client, cik="0000320193", entity_name="Apple Inc.", fiscal_year=2025
+    )
+    result = compute_altman_z_prime(snapshot)
+    assert result.z_score == pytest.approx(2.3464, abs=1e-3)
+    assert result.zone == RiskZone.GREY
+    assert result.is_complete
 
 
 def test_zone_boundaries():

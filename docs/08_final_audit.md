@@ -208,7 +208,7 @@ Every fact and evidence chunk shown carries its real accession number (`00003201
 
 ### 7.7 Altman Z' verification
 
-Unchanged formula, unchanged code path (`src/analysis/altman_z.py`, ADR-005) — this round touched no arithmetic. Re-confirmed live in this session: Microsoft's stored score is Z'=2.0060 (grey), matching the value independently re-derived in `scripts/verify_msft_zscore.py` and unchanged since the original Phase 7 audit (Section 2 above). Apple FY2025 correctly shows no score, with the real cause (`InsufficientDataError: missing real data for ['retained_earnings']`) surfaced as a data-quality issue rather than silently defaulted.
+Unchanged formula, unchanged code path (`src/analysis/altman_z.py`, ADR-005) — this round touched no arithmetic. Re-confirmed live in this session: Microsoft's stored score is Z'=2.0060 (grey), matching the value independently re-derived in `scripts/verify_msft_zscore.py` and unchanged since the original Phase 7 audit (Section 2 above). Apple FY2025 correctly shows no score, with the real cause (`InsufficientDataError: missing real data for ['retained_earnings']`) surfaced as a data-quality issue rather than silently defaulted. *(Correction, 2026-09-25: that missing value was a gap in this project's seed fixture, not in Apple's actual filing. Apple's FY2025 10-K reports retained earnings of -$14,264M; with the fixture corrected, Apple FY2025 scores Z'=2.3464, grey.)*
 
 ### 7.8 Piotroski F-Score verification
 

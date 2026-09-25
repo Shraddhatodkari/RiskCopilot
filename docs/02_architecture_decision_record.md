@@ -384,10 +384,12 @@ means by that phrase, and is recorded as future work in
 score**: `CompanyDossier.current_fiscal_year` is deliberately **not**
 derived only from the latest Altman/Piotroski score — a company can have a
 real, honestly-ingested fiscal year (real facts, real data-quality issues)
-with zero computable score at all, which is exactly Apple FY2025 in this
-project's own seed data (a missing `retained_earnings` concept blocks the
-Altman calculation entirely — see ADR-004/ADR-005's refuse-rather-than-
-guess principle). Deriving "current year" only from computed scores would
+with zero computable score at all (for example, a filing missing the
+`retained_earnings` concept blocks the Altman calculation entirely — see
+ADR-004/ADR-005's refuse-rather-than-guess principle). Apple FY2025 was
+originally cited here as a real example; that turned out to be a
+fixture-curation error (corrected 2026-09-25 — Apple's FY2025 10-K
+reports both retained earnings and stockholders' equity). Deriving "current year" only from computed scores would
 make that year, and its real data-quality issues, invisible. Instead
 `get_latest_known_fiscal_year()` (`src/persistence/storage.py`) is a
 `UNION ALL` across facts, issues, and both score tables, so a company is

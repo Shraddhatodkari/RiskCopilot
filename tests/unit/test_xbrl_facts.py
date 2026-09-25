@@ -3,11 +3,14 @@ Tests for the SEC XBRL ingestion/extraction logic, against real (fixture-
 captured) SEC EDGAR data for two real companies with genuinely different
 data-quality characteristics:
 
-- Apple Inc. (FY2025): total_assets/liabilities/current items/operating
-  income/revenues are clean, but RetainedEarningsAccumulatedDeficit and a
-  clean FY2025 StockholdersEquity fact are genuinely absent from what
-  data.sec.gov's companyconcept API returns (confirmed live on 2026-09-08).
-  This is the real-world "missing tag" case.
+- Apple Inc. (FY2025): every Altman concept, including
+  RetainedEarningsAccumulatedDeficit and StockholdersEquity, is present
+  under the FY2025 10-K (accession 0000320193-25-000079). An earlier
+  version of the fixture omitted those two entries and this file asserted
+  they were "genuinely absent"; re-verified live on 2026-09-25, they are
+  not. Apple's real remaining gap is interest_expense. The fixture also
+  carries distractor entries (a 2018 filing, a Q1 FY2026 10-Q) that the
+  extractor must ignore.
 - Microsoft Corporation (FY2025): every Phase-1 (Altman) concept is present
   and clean under a single accession number. Phase 2 added long_term_debt
   (for the Piotroski F-Score) and discovered that Microsoft's OWN FY2025
@@ -68,7 +71,34 @@ def test_msft_ignores_prior_year_comparative_in_same_filing(msft_client):
     assert snapshot.total_assets.period_end.isoformat() == "2025-06-30"
 
 
-def test_aapl_snapshot_flags_missing_retained_earnings_honestly(aapl_client):
+def test_aapl_fy2025_extracts_stockholders_equity_and_retained_earnings(aapl_client):
+    """Regression test: Apple's FY2025 10-K reports both concepts, and the
+    dashboard was wrongly showing them as missing because the fixture
+    lacked the FY2025 entries. Values re-verified live against data.sec.gov
+    (accession 0000320193-25-000079, filed 2025-10-31, period end
+    2025-09-27)."""
+    snapshot = build_financial_snapshot(
+        aapl_client, cik="0000320193", entity_name="Apple Inc.", fiscal_year=2025
+    )
+
+    assert snapshot.stockholders_equity is not None
+    assert snapshot.stockholders_equity.value == 73_733_000_000
+    assert snapshot.stockholders_equity.accession_number == "0000320193-25-000079"
+    assert snapshot.stockholders_equity.period_end.isoformat() == "2025-09-27"
+
+    # Real FY2025 value is a deficit; the extractor must NOT fall back to the
+    # 2018-filing distractors (52.6B / 62.9B) or the FY2024 value (-19.154B).
+    assert snapshot.retained_earnings is not None
+    assert snapshot.retained_earnings.value == -14_264_000_000
+    assert snapshot.retained_earnings.accession_number == "0000320193-25-000079"
+    assert snapshot.retained_earnings.period_end.isoformat() == "2025-09-27"
+
+    issue_concepts = {issue.concept for issue in snapshot.data_quality_issues}
+    assert "retained_earnings" not in issue_concepts
+    assert "stockholders_equity" not in issue_concepts
+
+
+def test_aapl_snapshot_reports_its_real_remaining_gap_honestly(aapl_client):
     snapshot = build_financial_snapshot(
         aapl_client, cik="0000320193", entity_name="Apple Inc.", fiscal_year=2025
     )
@@ -78,14 +108,10 @@ def test_aapl_snapshot_flags_missing_retained_earnings_honestly(aapl_client):
     assert snapshot.operating_income.value == 133_050_000_000
     assert snapshot.revenues.value == 416_161_000_000
 
-    # The genuinely missing/ambiguous fields must be None, NOT fabricated
-    # or silently defaulted to 0 or to a stale (2018) value.
-    assert snapshot.retained_earnings is None
-    assert snapshot.stockholders_equity is None
-
+    # interest_expense is Apple's one real FY2025 gap: it must be None and
+    # reported, never fabricated or defaulted to 0.
     issue_concepts = {issue.concept for issue in snapshot.data_quality_issues}
-    assert "retained_earnings" in issue_concepts
-    assert "stockholders_equity" in issue_concepts
+    assert issue_concepts == {"interest_expense"}
     for issue in snapshot.data_quality_issues:
         assert issue.severity == "missing"
         assert issue.detail  # a human-readable explanation must be present

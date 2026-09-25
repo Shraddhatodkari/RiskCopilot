@@ -92,10 +92,16 @@ def test_with_piotroski_flag_also_prints_f_score(monkeypatch, capsys):
 
 
 def test_insufficient_data_reports_cleanly_with_nonzero_exit(monkeypatch, capsys):
+    # Real Apple data with the equity tags deliberately hidden (same
+    # approach as tests/conftest.py::TagHidingClient): Apple's real FY2025
+    # 10-K has every Altman input, so the gap must be simulated to exercise
+    # the CLI's insufficient-data path.
     class _AaplFixtureClient(_FixtureBackedClient):
         def __init__(self, *_args, **_kwargs):
             with open(FIXTURES_DIR / "aapl_fy2025_companyconcept.json") as f:
                 self._data = json.load(f)
+            for tag in ("RetainedEarningsAccumulatedDeficit", "StockholdersEquity"):
+                self._data.pop(tag, None)
 
     monkeypatch.setattr(cli, "SecEdgarClient", _AaplFixtureClient)
 

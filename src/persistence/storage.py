@@ -348,8 +348,8 @@ def get_latest_known_fiscal_year(conn: sqlite3.Connection, cik: str) -> int | No
     score. Deliberately broader than "has a computed score", because a
     company can have a completely genuine, honestly-reported fiscal year
     with real ingested facts and real data-quality issues but NO
-    computable score at all (e.g. Apple FY2025 in this project's own seed
-    data, which is missing retained_earnings) — that year is still the
+    computable score at all (e.g. a year whose filing is missing
+    retained_earnings) — that year is still the
     company's "current" year for dashboard purposes, and its issues must
     not be silently dropped just because no score exists to hang them off
     of. Returns None only if this company has no data at all."""
