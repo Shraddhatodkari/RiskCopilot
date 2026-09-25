@@ -93,9 +93,15 @@ class CompanyDossier(BaseModel):
             return "No deterministic score could be computed for this company/year — see Data Quality."
         parts = []
         if self.latest_altman is not None:
-            parts.append(f"Altman Z' zone: {self.latest_altman['zone'].upper()}")
+            parts.append(
+                f"Altman Z' zone (FY{self.latest_altman['fiscal_year']}): "
+                f"{self.latest_altman['zone'].upper()}"
+            )
         if self.latest_piotroski is not None:
-            parts.append(f"Piotroski F-Score: {self.latest_piotroski['f_score']}/9")
+            parts.append(
+                f"Piotroski F-Score (FY{self.latest_piotroski['fiscal_year']}): "
+                f"{self.latest_piotroski['f_score']}/9"
+            )
         return " | ".join(parts)
 
 

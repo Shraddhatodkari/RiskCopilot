@@ -170,3 +170,53 @@ def test_nvidia_risk_overview_and_metrics_tabs_render_its_own_real_tier_and_rati
     metrics_tab_text = str(at.tabs[2].get("metric"))
     assert "Current Ratio" in metrics_tab_text
 
+
+
+_CIKS = {
+    "Microsoft Corporation": "0000789019",
+    "NVIDIA Corporation": "0001045810",
+    "Apple Inc.": "0000320193",
+}
+
+
+@pytest.mark.parametrize("company", list(_CIKS))
+def test_every_score_is_shown_next_to_its_own_fiscal_year(company):
+    """Regression test: the Company Overview header showed the Altman
+    Z'-Score with no fiscal year right beside the source filing's fiscal
+    year, so an older year's score (e.g. Apple's FY2024 2.1054 next to its
+    FY2025 filing) read as current. Microsoft and NVIDIA still genuinely
+    have Altman = FY2025 and Piotroski = FY2024, so every displayed score
+    must carry its OWN year. Expected years are read from the seeded DB,
+    not hardcoded."""
+    import sqlite3
+
+    from src.persistence.storage import get_latest_altman, get_latest_piotroski
+
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        altman = get_latest_altman(conn, _CIKS[company])
+        piotroski = get_latest_piotroski(conn, _CIKS[company])
+    finally:
+        conn.close()
+    assert altman is not None and piotroski is not None
+
+    at = _run_dashboard()
+    at.selectbox[0].set_value(company).run(timeout=30)
+    assert not at.exception
+
+    # Company Overview (tab 0): the metric tiles.
+    overview_metrics = {m.label: m.value for m in at.tabs[0].metric}
+    assert overview_metrics["Altman Z'-Score"] == (
+        f"{altman['z_score']:.4f} (FY{altman['fiscal_year']})"
+    )
+    assert overview_metrics["Piotroski F-Score"] == (
+        f"{piotroski['f_score']}/9 (FY{piotroski['fiscal_year']})"
+    )
+    overview_text = " ".join(m.value for m in at.tabs[0].markdown)
+    assert f"Altman Z' zone (FY{altman['fiscal_year']})" in overview_text
+    assert f"Piotroski F-Score (FY{piotroski['fiscal_year']})" in overview_text
+
+    # Risk Overview (tab 1): the component-score lines.
+    risk_text = " ".join(m.value for m in at.tabs[1].markdown)
+    assert f"Altman Z'-Score (FY{altman['fiscal_year']}): **{altman['z_score']:.4f}**" in risk_text
+    assert f"Piotroski F-Score (FY{piotroski['fiscal_year']}): **{piotroski['f_score']}/9**" in risk_text

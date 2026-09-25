@@ -193,7 +193,14 @@ with tab_overview:
         if dossier.latest_altman:
             zone = dossier.latest_altman["zone"]
             zone_icon = {"safe": "🟢", "grey": "🟡", "distress": "🔴"}.get(zone, "")
-            st.metric("Altman Z'-Score", f"{dossier.latest_altman['z_score']:.4f}", zone.upper() + " " + zone_icon)
+            # Each score carries its OWN fiscal year: Altman's and Piotroski's
+            # latest stored results can belong to different years than each
+            # other and than the source filing shown above.
+            st.metric(
+                "Altman Z'-Score",
+                f"{dossier.latest_altman['z_score']:.4f} (FY{dossier.latest_altman['fiscal_year']})",
+                zone.upper() + " " + zone_icon,
+            )
         else:
             st.metric("Altman Z'-Score", "N/A", "not computable — see Data Quality")
     with col2:
@@ -245,13 +252,15 @@ with tab_risk:
     c1, c2 = st.columns(2)
     with c1:
         if dossier.latest_altman:
-            st.write(f"Altman Z'-Score: **{dossier.latest_altman['z_score']:.4f}** "
+            st.write(f"Altman Z'-Score (FY{dossier.latest_altman['fiscal_year']}): "
+                     f"**{dossier.latest_altman['z_score']:.4f}** "
                      f"({dossier.latest_altman['zone'].upper()} zone)")
         else:
             st.write("Altman Z'-Score: **not computable** for the current fiscal year.")
     with c2:
         if dossier.latest_piotroski:
-            st.write(f"Piotroski F-Score: **{dossier.latest_piotroski['f_score']}/9**")
+            st.write(f"Piotroski F-Score (FY{dossier.latest_piotroski['fiscal_year']}): "
+                     f"**{dossier.latest_piotroski['f_score']}/9**")
         else:
             st.write("Piotroski F-Score: **not computable** for the current fiscal year.")
 
