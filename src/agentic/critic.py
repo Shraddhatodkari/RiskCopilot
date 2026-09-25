@@ -43,6 +43,7 @@ project's human-in-the-loop requirement.
 from __future__ import annotations
 
 import re
+from decimal import ROUND_HALF_EVEN, ROUND_HALF_UP, Decimal, InvalidOperation
 
 from pydantic import BaseModel
 
@@ -137,6 +138,56 @@ def _genuine_value_tokens(text: str) -> list[str]:
     return tokens
 
 
+def _parse_plain_number(token: str) -> tuple[Decimal, int, bool] | None:
+    """Parses a decorated number token ('2.11', '$1,234', '45.6%') into
+    (exact decimal value, decimal_places, is_percent). Returns None for a
+    fraction-style token ('6/9') or anything else that isn't a plain
+    number. Decimal (not float) so '2.125' is exactly 2.125."""
+    if "/" in token:
+        return None
+    is_percent = token.endswith("%")
+    core = (token[:-1] if is_percent else token).replace("$", "").replace(",", "")
+    try:
+        value = Decimal(core)
+    except InvalidOperation:
+        return None
+    decimals = len(core.split(".", 1)[1]) if "." in core else 0
+    return value, decimals, is_percent
+
+
+def _values_match(expected: str, candidate: str) -> bool:
+    """True if `candidate` (a number in the LLM's sentence) states the
+    trusted value `expected` either exactly or correctly ROUNDED — e.g. a
+    computed 2.1054 written as '2.11', '2.1' or '2'.
+
+    This is not a fuzzy "close enough" match: `candidate` must equal
+    `expected` rounded to exactly the number of decimals `candidate`
+    itself shows. So a wrong value at the same precision (2.15 for a true
+    2.1054, or 9.99 for a true 2.01) still fails, and so does a candidate
+    claiming MORE precision than the trusted value carries (2.1054 when
+    only '2.11' was supplied), because those extra digits are invented.
+    A percentage never matches a plain number, and fraction scores such as
+    the Piotroski '6/9' have no meaningful rounding and must match exactly.
+    """
+    if expected == candidate:
+        return True
+    exp = _parse_plain_number(expected)
+    cand = _parse_plain_number(candidate)
+    if exp is None or cand is None:
+        return False
+    exp_value, exp_decimals, exp_percent = exp
+    cand_value, cand_decimals, cand_percent = cand
+    if exp_percent != cand_percent or cand_decimals > exp_decimals:
+        return False
+    # Accept both common conventions for an exact half (2.125 -> 2.13 by
+    # round-half-up, 2.12 by round-half-even); they differ only on a tie.
+    quantum = Decimal(1).scaleb(-cand_decimals)
+    return cand_value in {
+        exp_value.quantize(quantum, rounding=ROUND_HALF_UP),
+        exp_value.quantize(quantum, rounding=ROUND_HALF_EVEN),
+    }
+
+
 def _expected_value_and_year(description: str) -> tuple[str | None, str | None]:
     """Pulls the one real value token (e.g. '2.01' or '6/9') and the
     fiscal year (e.g. '2025') out of a trusted-metric description string
@@ -185,10 +236,17 @@ def _sentence_metric_status(sentence: str, trusted_metrics: dict[str, str]) -> t
         mentioned_any_metric = True
         expected_value, expected_year = _expected_value_and_year(description)
 
-        if expected_value and expected_value in sentence_tokens:
-            matched_values.add(expected_value)
-        elif expected_value:
-            has_mismatch = True  # named metric, but no matching value present
+        if expected_value:
+            # Accept an exact or correctly-rounded restatement, and record the
+            # sentence's own token (e.g. '2.11', not the description's
+            # '2.1054') so it is excluded from the leftover check below.
+            matched_token = next(
+                (tok for tok in sentence_tokens if _values_match(expected_value, tok)), None
+            )
+            if matched_token is not None:
+                matched_values.add(matched_token)
+            else:
+                has_mismatch = True  # named metric, but no matching value present
 
         if expected_year:
             fy_years = {m.group(1) for m in _FISCAL_YEAR_PATTERN.finditer(sentence)}

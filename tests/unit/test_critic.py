@@ -196,3 +196,76 @@ def test_genuine_numeric_claims_remain_protected_even_near_a_bare_year():
             f"expected a genuine numeric claim to still require a citation: {text!r}"
         )
         assert not report.passed
+
+
+PRECISE_TRUSTED_METRICS = {
+    "altman_z_score": "2.1054 (grey zone, FY2025)",
+    "piotroski_f_score": "6/9 (FY2025)",
+}
+
+
+def test_correctly_rounded_trusted_metric_passes():
+    """Regression test for the reported false alarm: the critic blocked
+    'Altman Z-score of 2.11' although 2.11 is the computed 2.1054 rounded
+    to two decimals. Coarser correct roundings must pass too."""
+    for stated in ("2.11", "2.1", "2", "2.105", "2.1054"):
+        text = f"The company's Altman Z-score of {stated} places it in the grey zone."
+        report = check_grounding(
+            text, VALID_CHUNKS, VALID_METRICS, trusted_metrics=PRECISE_TRUSTED_METRICS
+        )
+        assert report.passed, f"expected a correct rounding to pass: {stated!r}"
+        assert report.uncited_numeric_sentences == []
+
+
+def test_wrong_value_at_rounded_precision_still_fails():
+    """Rounding tolerance must not become 'any nearby number': 2.1054 rounds
+    to 2.11, so 2.10 and 2.15 are misstatements, as is 2.2 (it rounds to
+    2.1), and 21.05 (a shifted decimal point)."""
+    for stated in ("2.10", "2.15", "2.2", "21.05"):
+        text = f"The company's Altman Z-score of {stated} places it in the grey zone."
+        report = check_grounding(
+            text, VALID_CHUNKS, VALID_METRICS, trusted_metrics=PRECISE_TRUSTED_METRICS
+        )
+        assert not report.passed, f"expected a wrong value to fail: {stated!r}"
+        assert report.uncited_numeric_sentences == [text]
+
+
+def test_more_precision_than_supplied_is_not_a_rounding():
+    """The dashboard hands the model '2.11'. If the narrative claims
+    '2.1054', those extra digits were not supplied to it, so they cannot be
+    verified against the trusted value and must fail."""
+    text = "The company's Altman Z-score of 2.1054 places it in the grey zone."
+    report = check_grounding(text, VALID_CHUNKS, VALID_METRICS, trusted_metrics={
+        "altman_z_score": "2.11 (grey zone, FY2025)",
+    })
+    assert not report.passed
+
+
+def test_exact_half_accepts_either_standard_rounding():
+    """For a value exactly on a half (2.125), writers round either way
+    (2.13 half-up, 2.12 half-even); both are honest roundings."""
+    trusted = {"altman_z_score": "2.125 (grey zone, FY2025)"}
+    for stated in ("2.13", "2.12"):
+        text = f"The company's Altman Z-score of {stated} places it in the grey zone."
+        report = check_grounding(text, VALID_CHUNKS, VALID_METRICS, trusted_metrics=trusted)
+        assert report.passed, stated
+
+
+def test_fraction_scores_still_require_an_exact_match():
+    """A Piotroski F-score has no meaningful rounding: '6/9' is only
+    matched by '6/9'."""
+    text = "The company's Piotroski F-score of 7/9 indicates a moderate profile."
+    report = check_grounding(
+        text, VALID_CHUNKS, VALID_METRICS, trusted_metrics=PRECISE_TRUSTED_METRICS
+    )
+    assert not report.passed
+    assert report.uncited_numeric_sentences == [text]
+
+
+def test_rounded_value_with_wrong_fiscal_year_still_fails():
+    """Rounding tolerance applies to the value only, never to the year."""
+    text = "The company's Altman Z-score was 2.11 in FY2023."
+    report = check_grounding(
+        text, VALID_CHUNKS, VALID_METRICS, trusted_metrics=PRECISE_TRUSTED_METRICS
+    )
+    assert not report.passed
