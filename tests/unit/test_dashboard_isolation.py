@@ -220,3 +220,16 @@ def test_every_score_is_shown_next_to_its_own_fiscal_year(company):
     risk_text = " ".join(m.value for m in at.tabs[1].markdown)
     assert f"Altman Z'-Score (FY{altman['fiscal_year']}): **{altman['z_score']:.4f}**" in risk_text
     assert f"Piotroski F-Score (FY{piotroski['fiscal_year']}): **{piotroski['f_score']}/9**" in risk_text
+
+
+def test_agentic_tab_labels_each_passage_with_its_fiscal_year_and_relevance():
+    """The Agentic Narrative tab must show which filing year each retrieved
+    passage comes from and whether it clears the relevance floor, so a
+    reviewer can see exactly what evidence the model was given."""
+    at = _run_dashboard()
+    at.selectbox[0].set_value("NVIDIA Corporation").run(timeout=30)
+    assert not at.exception
+    agentic = " ".join(m.value for m in at.tabs[5].markdown)
+    assert "nvda-2025-rf" in agentic
+    assert "FY2025)" in agentic  # e.g. "(score 0.317, FY2025)"
+    assert "aapl-2025-rf" not in agentic and "msft-2025-rf" not in agentic

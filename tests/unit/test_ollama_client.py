@@ -87,6 +87,21 @@ def test_sends_system_and_user_prompt_as_chat_messages():
     assert session.calls[0]["url"] == "http://localhost:11434/api/chat"
 
 
+
+def test_requests_an_explicit_context_window(monkeypatch):
+    """Without num_ctx, Ollama uses its version-dependent default (2048 on
+    older releases) and truncates an overflowing prompt from the START,
+    dropping the system rules. The client must always send num_ctx."""
+    monkeypatch.delenv("OLLAMA_NUM_CTX", raising=False)
+    session = _ScriptedSession([_FakeResponse(200, {"message": {"content": "ok"}})])
+    OllamaLLMClient(session=session).generate("sys", "user")
+    assert session.calls[0]["json"]["options"]["num_ctx"] == OllamaLLMClient.DEFAULT_NUM_CTX
+
+    monkeypatch.setenv("OLLAMA_NUM_CTX", "8192")
+    session = _ScriptedSession([_FakeResponse(200, {"message": {"content": "ok"}})])
+    OllamaLLMClient(session=session).generate("sys", "user")
+    assert session.calls[0]["json"]["options"]["num_ctx"] == 8192
+
 def test_connection_error_is_wrapped_with_actionable_message():
     session = _ScriptedSession([requests.exceptions.ConnectionError("refused")])
     client = OllamaLLMClient(session=session)

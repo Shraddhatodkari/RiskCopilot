@@ -112,6 +112,12 @@ class OllamaLLMClient:
     DEFAULT_MODEL = "llama3.2:latest"
     DEFAULT_TIMEOUT = 300.0
     DEFAULT_KEEP_ALIVE = "30m"
+    # Context window requested from Ollama. Set explicitly because Ollama's
+    # own default varies by version (2048 tokens on older releases) and an
+    # overflowing prompt is truncated from the START — dropping the system
+    # rules first. narrative.py caps evidence at ~6,000 characters, so the
+    # full prompt is roughly 2,500 tokens and fits with room for the answer.
+    DEFAULT_NUM_CTX = 4096
 
     def __init__(
         self,
@@ -128,6 +134,7 @@ class OllamaLLMClient:
         else:
             self._timeout = float(os.environ.get("OLLAMA_TIMEOUT_SECONDS", self.DEFAULT_TIMEOUT))
         self._keep_alive = keep_alive or os.environ.get("OLLAMA_KEEP_ALIVE", self.DEFAULT_KEEP_ALIVE)
+        self._num_ctx = int(os.environ.get("OLLAMA_NUM_CTX", self.DEFAULT_NUM_CTX))
         self._session = session or requests.Session()
 
     def generate(self, system_prompt: str, user_prompt: str) -> str:
@@ -140,6 +147,7 @@ class OllamaLLMClient:
             ],
             "stream": False,
             "keep_alive": self._keep_alive,
+            "options": {"num_ctx": self._num_ctx},
         }
         try:
             response = self._session.post(url, json=payload, timeout=self._timeout)

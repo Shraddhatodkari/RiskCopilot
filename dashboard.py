@@ -443,7 +443,7 @@ with tab_agentic:
     else:
         from src.agentic.approval import create_memo
         from src.agentic.llm_client import FakeLLMClient, OllamaConnectionError, OllamaError, OllamaLLMClient
-        from src.agentic.narrative import draft_risk_narrative
+        from src.agentic.narrative import MIN_EVIDENCE_SCORE, draft_risk_narrative, select_evidence
 
         col_a, col_b, col_c = st.columns(3)
         with col_a:
@@ -493,9 +493,23 @@ with tab_agentic:
             key="agentic_query",
         )
         retrieved = index.search(query, top_k=3)
+        usable = select_evidence(retrieved)
+        usable_ids = {r.chunk.chunk_id for r in usable}
         st.write(f"**Retrieved passages (real {dossier.entity_name} filing text):**")
         for r in retrieved:
-            st.write(f"- `{r.chunk.chunk_id}` (score {r.score:.3f}): {r.chunk.heading}")
+            used_note = "" if r.chunk.chunk_id in usable_ids else f" — _below relevance floor {MIN_EVIDENCE_SCORE}, not sent to the model_"
+            st.write(f"- `{r.chunk.chunk_id}` (score {r.score:.3f}, FY{r.chunk.fiscal_year}): {r.chunk.heading}{used_note}")
+        if not usable:
+            st.warning(
+                "No retrieved passage is relevant enough to ground a narrative for this query. "
+                "Generating will report insufficient evidence instead of calling the model."
+            )
+        evidence_years = {r.chunk.fiscal_year for r in usable}
+        if dossier.current_fiscal_year and evidence_years and evidence_years != {dossier.current_fiscal_year}:
+            st.warning(
+                f"Risk-factor evidence is from FY{', FY'.join(str(y) for y in sorted(evidence_years))}, "
+                f"while the current fiscal year shown for this company is FY{dossier.current_fiscal_year}."
+            )
 
         metrics: dict[str, str] = {}
         if dossier.latest_altman:
@@ -514,8 +528,8 @@ with tab_agentic:
                     "[[metric:altman_z_score]] warrants continued monitoring. Its Piotroski F-Score "
                     f"{metrics.get('piotroski_f_score', 'N/A')} [[metric:piotroski_f_score]] reflects "
                     "its fundamental trend. Filed disclosures note "
-                    + (retrieved[0].chunk.heading.lower() if retrieved else "no specific evidence")
-                    + " [[chunk:" + (retrieved[0].chunk.chunk_id if retrieved else "none") + "]]."
+                    + (usable[0].chunk.heading.lower() if usable else "no specific evidence")
+                    + " [[chunk:" + (usable[0].chunk.chunk_id if usable else "none") + "]]."
                 )
                 llm_client = FakeLLMClient(responses=[scripted_response])
             else:
@@ -529,23 +543,28 @@ with tab_agentic:
             except OllamaError as e:
                 st.error(f"Ollama call failed: {e}")
             else:
-                memo_fy = dossier.current_fiscal_year or 0
-                memo = create_memo(
-                    cik=dossier.cik, entity_name=dossier.entity_name, fiscal_year=memo_fy,
-                    narrative_text=draft.narrative_text, critic_report=draft.critic_report,
-                )
-                source_label = "scripted fake LLM (demo)" if demo_mode else f"real local Ollama ({model_name})"
-                st.write(f"**Narrative** — {dossier.entity_name}, source: {source_label}:")
-                st.write(draft.narrative_text)
-                st.write(f"**Grounding critic:** {'✅ PASSED' if draft.critic_report.passed else '❌ FAILED'}")
-                st.write(f"**Memo status:** `{memo.status.value}`")
-                if not draft.critic_report.passed:
-                    st.write(f"Ungrounded citations: {draft.critic_report.ungrounded_citations}")
-                    st.write(f"Uncited numeric sentences: {draft.critic_report.uncited_numeric_sentences}")
-                    st.info(
-                        "A memo whose critic fails is blocked from approval unless a human reviewer "
-                        "supplies an explicit override reason — it never silently becomes final."
+                if draft.insufficient_evidence:
+                    st.warning(draft.narrative_text)
+                    st.caption("No memo was created: there is no narrative to approve.")
+                else:
+                    memo_fy = dossier.current_fiscal_year or 0
+                    memo = create_memo(
+                        cik=dossier.cik, entity_name=dossier.entity_name, fiscal_year=memo_fy,
+                        narrative_text=draft.narrative_text, critic_report=draft.critic_report,
                     )
+                    source_label = "scripted fake LLM (demo)" if demo_mode else f"real local Ollama ({model_name})"
+                    st.write(f"**Narrative** — {dossier.entity_name}, source: {source_label}:")
+                    st.write(draft.narrative_text)
+                    st.caption(f"Evidence shown to the model: {', '.join(draft.evidence_used)}")
+                    st.write(f"**Grounding critic:** {'✅ PASSED' if draft.critic_report.passed else '❌ FAILED'}")
+                    st.write(f"**Memo status:** `{memo.status.value}`")
+                    if not draft.critic_report.passed:
+                        st.write(f"Ungrounded citations: {draft.critic_report.ungrounded_citations}")
+                        st.write(f"Uncited numeric sentences: {draft.critic_report.uncited_numeric_sentences}")
+                        st.info(
+                            "A memo whose critic fails is blocked from approval unless a human reviewer "
+                            "supplies an explicit override reason — it never silently becomes final."
+                        )
 
 # ============================================================================
 # Historical Validation — company-agnostic (a fixed, real backtest study)
