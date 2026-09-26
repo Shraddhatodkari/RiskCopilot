@@ -19,21 +19,20 @@ Two responsibilities, kept separate on purpose:
 
 2. `extract_item_1a_chunks` — a pure, deterministic function: given HTML
    text (however it was obtained) plus the company's identity/filing
-   metadata, locates the "Item 1A" section, strips markup, splits it into
-   paragraph-level chunks, and attaches a bold/short-line heading to each
-   chunk where one precedes it. This is fully unit-testable without any
-   network call — see tests/unit/test_filing_document_client.py, which
-   exercises it against a constructed HTML fixture built to match a real
-   10-K's actual heading/paragraph structure (bold `<b>`/`<strong>`
-   sub-headings immediately followed by body paragraphs — the structure
-   real filings, including this project's own curated Apple/Microsoft/
-   NVIDIA fixtures, actually use). Stated plainly: this sandbox cannot
-   fetch a live company's raw, unprocessed HTML bytes to test this
-   function against arbitrary real markup variation, so this is a
-   verified-against-representative-structure guarantee, not a
-   verified-against-every-real-company's-actual-template one — the same
-   kind of verification boundary already documented for
-   `OllamaLLMClient` (ADR-011) and the SEC EDGAR client's retry logic.
+   metadata, locates the real "Item 1A" section, strips markup and page
+   furniture, splits it into bounded paragraph-level chunks, and attaches
+   the preceding bold risk title to each chunk. Fully unit-testable without
+   any network call — see tests/unit/test_filing_document_client.py.
+
+   Verification boundary, stated plainly: on 2026-09-26 the extractor was
+   run against nine real FY2025 10-Ks fetched live from SEC EDGAR (Alphabet,
+   Amazon, Apple, Coca-Cola, Johnson & Johnson, JPMorgan Chase, Microsoft,
+   NVIDIA, Tesla); each produced 34-83 correctly headed chunks of at most
+   MAX_CHUNK_CHARS with no exhibit-index or signature text. The previous
+   version failed on all nine (see docs/09_final_verification_report.md
+   §1f). Nine filers is evidence, not proof: an unusual filing template can
+   still defeat the heading heuristics, in which case this returns [] (an
+   honest miss) rather than guessed text.
 
 A chunk of real HTML this function fails to parse usefully (no "Item 1A"
 heading found, or no chunk of reasonable length extracted) returns an

@@ -22,7 +22,7 @@ Given any real US-listed company, entered as a ticker, CIK, or company name, Ris
 - Tracks **multi-year trends** for every metric, using only real stored fiscal years, never an interpolated or estimated data point
 - Extracts and categorizes the company's own **SEC Item 1A risk-factor disclosures**
 - Assigns a **deterministic overall risk tier** from a fixed, documented rule table, never an LLM judgment call
-- Generates a **grounded AI risk narrative**, retrieval-based and checked line by line by a deterministic grounding critic before it can proceed
+- Generates a **grounded AI risk narrative**, retrieval-based and checked line by line by a deterministic grounding critic before it can proceed. Retrieval is keyword-based (TF-IDF); if no risk-factor passage is relevant enough, RiskCopilot says the evidence is insufficient instead of asking the model to write one
 - Requires **human approval** before any AI-generated memo is considered final
 - Includes a **historical backtest** against real corporate bankruptcies, with its statistical limitations disclosed rather than hidden
 

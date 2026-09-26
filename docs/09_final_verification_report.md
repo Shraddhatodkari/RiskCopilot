@@ -490,6 +490,65 @@ additive.
   cybersecurity-risk relationship — **fails**; a wrong fiscal year on a
   correct value — **fails**.
 
+## §1f. Agentic Narrative: off-topic output for Alphabet FY2025 (evidence extraction)
+
+**Reported symptom.** Alphabet Inc. (CIK 0001652044), FY2025 (Altman Z' 2.9032,
+Piotroski 6/9). The only retrieved passage was `alph-2025-live-1`, heading
+"Risk Factor 1", score ≈ 0.044. Ollama replied "There is no specific problem to
+solve..." and discussed 10-K exhibits such as 10.01. The grounding critic
+correctly failed it and approval was blocked.
+
+**Root cause (verified against the real filing, accession 0001652044-26-000018).**
+
+1. `_isolate_item_1a_html` treated the LAST "Item 1A" mention as the section
+   heading. Alphabet's 10-K mentions "Item 1A" ten times; the last is a
+   cross-reference in a later section. With no Item 1B/2 after it, the
+   extractor returned everything to the end of the document: MD&A, financial
+   statements, exhibit index and signatures.
+2. Headings were recognized only in `<b>`/`<strong>`. Inline-XBRL 10-Ks use
+   `font-weight:700` spans, so no headings were found and the whole slice
+   became one 172,261-character chunk. Bold text over 150 characters (most
+   risk titles) was discarded outright.
+3. `OllamaLLMClient` sent no `num_ctx`. Ollama truncates an overflowing prompt
+   from the start, so the system rules and metrics were dropped and the model
+   saw only the tail of that chunk: the exhibit index and signature page.
+4. No relevance floor: a 0.044 match was still handed to the model.
+
+The same extraction defect affected every real 10-K checked (Apple,
+Microsoft, NVIDIA, JPMorgan, Coca-Cola and Amazon produced 96k-599k character
+blobs; Tesla and J&J a single wrong fragment). The critic was not the problem
+and was not changed.
+
+**Fix.** Commits `d6c2740` (extraction, stale-cache handling) and `1ed0529`
+(narrative evidence selection, Ollama context, dashboard). Section isolation now
+requires a block-starting "Item 1A" followed by "Risk Factors", pairs it with the
+next block-starting Item 1B/1C/2, keeps the longest bounded span and rejects an
+unbounded one; styled bold spans are headings; page furniture is removed; chunks
+are capped at 2,000 characters. Live-cache evidence written by the old extractor
+is ignored so it is re-fetched. The narrative uses only passages scoring at least
+0.05, within a 6,000-character budget, and reports insufficient evidence instead
+of calling the model when none qualify; Ollama is sent `num_ctx` = 4096.
+
+**Verification.**
+- Nine real FY2025 10-Ks, fetched live from SEC EDGAR: 34-83 correctly headed
+  chunks each, none over 2,000 characters, no exhibit or signature text.
+  Alphabet: 58 chunks; top matches for the dashboard's default query score
+  0.206-0.233 (was one 0.044 match).
+- Alphabet's Altman Z' re-derived by hand from the stored FY2025 facts: 2.9032,
+  identical to the engine.
+- New tests: 8 extractor tests (all fail on the previous extractor), 3 registry
+  tests, 8 narrative regression tests including the Alphabet end-to-end case,
+  1 Ollama test, 1 dashboard test. Full suite: see the commit history.
+
+**Action for existing installs.** An `data/evidence_cache/*_risk_factors.json`
+written before this fix is now ignored automatically. Re-run "Analyze a new
+company" for that company (with evidence fetching) to extract it again.
+
+**Not verified here.** Real Ollama output quality after the fix: this
+environment cannot reach a local Ollama server. The pipeline was exercised with
+scripted model responses; run `python scripts/verify_ollama_connection.py` and
+generate a narrative on a machine running Ollama.
+
 ## 8. Conclusion
 
 Every claim in this report is backed by a command run against this exact
