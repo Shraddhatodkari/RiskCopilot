@@ -37,6 +37,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from src.ingestion.filing_document_client import EXTRACTOR_VERSION
 from src.retrieval.models import RiskFactorChunk
 from src.retrieval.tfidf_index import TfidfRiskFactorIndex, load_chunks_from_fixture
 
@@ -61,6 +62,21 @@ def _discover_evidence_files() -> list[Path]:
     return files
 
 
+def _is_stale_live_cache(path: Path, data: dict) -> bool:
+    """A live-cache file written by an older Item 1A extractor is not
+    trusted. Extractor version 1 took the last "Item 1A" mention in a
+    filing as the section start, which in real 10-Ks (Alphabet, Apple,
+    NVIDIA, Coca-Cola, Amazon, ...) is often a cross-reference, and so
+    cached whole back halves of filings — financial statements, exhibit
+    indexes, signatures — as "risk factors". Such a file is ignored here,
+    so the company shows as having no evidence and the next "Analyze a new
+    company" run re-fetches it with the current extractor. Curated
+    fixtures under tests/fixtures/ are not live-extracted and are exempt."""
+    if path.parent.resolve() != _LIVE_CACHE_DIR.resolve():
+        return False
+    return int(data.get("extractor_version", 1)) < EXTRACTOR_VERSION
+
+
 def _build_registry() -> dict[str, Path]:
     """CIK -> evidence file path, built fresh from whatever real evidence
     files currently exist on disk. Rebuilt on every call (there are only a
@@ -75,6 +91,8 @@ def _build_registry() -> dict[str, Path]:
             continue  # not a real evidence file; skip rather than crash the dashboard
         cik = data.get("cik")
         if not cik:
+            continue
+        if _is_stale_live_cache(path, data):
             continue
         if cik in registry and registry[cik] != path:
             raise EvidenceIntegrityError(

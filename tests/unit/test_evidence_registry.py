@@ -144,3 +144,57 @@ def test_evidence_directory_scan_ignores_unrelated_json_files(tmp_path, monkeypa
 
     assert registry_module.evidence_available("0000222222") is True
     assert registry_module.evidence_available("0000999999") is False
+
+
+import src.reporting.evidence_registry as registry_module  # noqa: E402
+
+
+def _write_live_cache(directory, extractor_version):
+    import json
+
+    directory.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "cik": "0001652044",
+        "entity_name": "Alphabet Inc.",
+        "fiscal_year": 2025,
+        "accession_number": "0001652044-26-000018",
+        "source_document_url": "https://example.invalid/goog-20251231.htm",
+        "chunks": [{
+            "chunk_id": "alph-2025-live-1",
+            "heading": "Risk Factor 1",
+            "text": "Item 1A, \"Risk Factors\" of this Annual Report ... 10.01 Form of Indemnification Agreement ...",
+        }],
+    }
+    if extractor_version is not None:
+        payload["extractor_version"] = extractor_version
+    (directory / "alphabet_inc_fy2025_risk_factors.json").write_text(json.dumps(payload))
+
+
+def test_live_cache_written_by_the_old_extractor_is_ignored(tmp_path, monkeypatch):
+    """A user's existing data/evidence_cache/ file from the original
+    extractor (no extractor_version: the whole back half of the filing as
+    one "Risk Factor 1" chunk) must not keep being served after the fix.
+    Ignoring it makes the company show as having no evidence, so the next
+    "Analyze a new company" run re-fetches it with the current extractor."""
+    live = tmp_path / "evidence_cache"
+    _write_live_cache(live, extractor_version=None)
+    monkeypatch.setattr(registry_module, "_FIXTURES_DIR", tmp_path / "no-fixtures")
+    monkeypatch.setattr(registry_module, "_LIVE_CACHE_DIR", live)
+    assert registry_module.evidence_available("0001652044") is False
+    assert registry_module.load_evidence_index("0001652044") is None
+
+
+def test_live_cache_written_by_the_current_extractor_is_used(tmp_path, monkeypatch):
+    from src.ingestion.filing_document_client import EXTRACTOR_VERSION
+
+    live = tmp_path / "evidence_cache"
+    _write_live_cache(live, extractor_version=EXTRACTOR_VERSION)
+    monkeypatch.setattr(registry_module, "_FIXTURES_DIR", tmp_path / "no-fixtures")
+    monkeypatch.setattr(registry_module, "_LIVE_CACHE_DIR", live)
+    assert registry_module.evidence_available("0001652044") is True
+
+
+def test_curated_fixtures_are_never_treated_as_stale_live_caches():
+    """The curated fixtures carry no extractor_version (they are not
+    live-extracted) and must stay registered."""
+    assert {"0000320193", "0000789019", "0001045810"} <= set(registry_module.registered_ciks())

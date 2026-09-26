@@ -1,0 +1,60 @@
+<!--
+Synthetic, structure-only 10-K fixture for tests/unit/test_filing_document_client.py.
+The WORDING is invented; the MARKUP STRUCTURE reproduces what a real inline-XBRL 10-K
+(Alphabet Inc. FY2025, accession 0001652044-26-000018) actually contains, which the
+original extractor mishandled:
+  - "Item 1A" appears in the table of contents, the forward-looking-statements note,
+    mid-sentence cross-references before AND after the real section, and the heading;
+  - the real heading and risk titles are <span style="font-weight:700"> (no <b>/<strong>);
+  - risk titles are long bold-italic sentences (> 150 characters);
+  - each page break carries a page number ("21."), a "Table of Contents" link and a
+    bold running header with the company name;
+  - Item 1A is followed by Item 1B and Item 1C;
+  - a LATER cross-reference ("see Item 1A Risk Factors") has no Item 1B/2 after it,
+    followed by an exhibit index (10.01) and signatures.
+-->
+<html><body>
+<div><table>
+<tr><td><div><span style="font-weight:400">Item 1.</span></div></td><td><div><span>Business</span></div></td></tr>
+<tr><td><div><span style="font-weight:400">Item 1A.</span></div></td><td><div><span>Risk Factors</span></div></td></tr>
+<tr><td><div><span style="font-weight:400">Item 1B.</span></div></td><td><div><span>Unresolved Staff Comments</span></div></td></tr>
+<tr><td><div><span style="font-weight:400">Item 1C.</span></div></td><td><div><span>Cybersecurity</span></div></td></tr>
+<tr><td><div><span style="font-weight:400">Item 2.</span></div></td><td><div><span>Properties</span></div></td></tr>
+</table></div>
+
+<div><span style="font-weight:400">This report contains forward-looking statements in several sections, including Part I, Item 1A "Risk Factors;" and Part II, Item 7 "Management's Discussion and Analysis." Actual results may differ materially.</span></div>
+
+<div><span style="font-weight:400">For additional information about competition, see Item 1A Risk Factors of this Annual Report on Form 10-K.</span></div>
+
+<div style="margin-top:6pt"><span style="font-weight:700">ITEM 1A.</span><span style="font-weight:700;padding-left:11pt">RISK FACTORS</span></div>
+<div><span style="font-weight:400">Our operations and financial results are subject to various risks and uncertainties, including those described below, which could harm our business, financial condition, and operating results.</span></div>
+<div><span style="font-weight:700">Risks Specific to our Company</span></div>
+<div><span style="font-style:italic;font-weight:700">We generate most of our revenues from advertising. Reduced spending by advertisers, a loss of partners, shifts in online advertising, or new technologies that block advertisements online could harm our business and operating results.</span></div>
+<div><span style="font-weight:400">Advertisers can terminate their contracts with us at any time, and expenditures by advertisers tend to correlate with overall economic conditions. Adverse macroeconomic conditions could reduce advertising demand and harm our financial condition and operating results.</span></div>
+<div><span style="font-weight:400">Changes to advertising policies and data privacy practices could limit the advertising services we are able to provide, and technologies that block the display of advertisements could impair the availability of our advertising products.</span></div>
+<div><span style="font-style:italic;font-weight:700">We face intense competition. If we do not continue to innovate and provide products and services that are useful to users, customers, and partners, we may not remain competitive, which could harm our business, financial condition, and operating results.</span></div>
+<div><span style="font-weight:400">Our businesses are rapidly evolving and intensely competitive, and we face formidable competition in every aspect of our business, including from companies that have greater resources in particular markets. Competitive pressure could reduce our market share and our margins over</span></div>
+<div><div><div><span style="font-weight:400">21.  </span></div></div></div><hr style="page-break-after:always"/>
+<div><table><tr><td><div><span style="text-decoration:underline"><a href="#toc">Table of Contents</a></span></div></td><td><span style="font-size:9pt;font-weight:700">Alphabet Inc.</span></td></tr></table></div>
+<div><span style="font-weight:400">time, and could require us to increase our spending on research and development to keep pace with competitors.</span></div>
+<div><span style="font-style:italic;font-weight:700">Our indebtedness and future financing needs could adversely affect our liquidity, and changes in interest rates could increase our borrowing costs.</span></div>
+<div><span style="font-weight:400">We have outstanding debt and may incur additional indebtedness. Higher interest rates could increase the cost of refinancing that debt, reduce our liquidity, and limit the capital available to invest in our business or return to stockholders.</span></div>
+<div><div><div><span style="font-weight:400">22.  </span></div></div></div><hr style="page-break-after:always"/>
+<div><table><tr><td><div><span style="text-decoration:underline"><a href="#toc">Table of Contents</a></span></div></td><td><span style="font-size:9pt;font-weight:700">Alphabet Inc.</span></td></tr></table></div>
+<div><span style="font-style:italic;font-weight:700">Cyberattacks and security vulnerabilities could result in serious harm to our reputation, business, and financial condition.</span></div>
+<div><span style="font-weight:400">Threat actors continuously attempt to gain unauthorized access to our systems and data through malware, phishing, and other attacks. A significant breach could require costly remediation and expose us to litigation and regulatory penalties.</span></div>
+<div><div><div><span style="font-weight:400">23.  </span></div></div></div><hr style="page-break-after:always"/>
+<div><table><tr><td><div><span style="text-decoration:underline"><a href="#toc">Table of Contents</a></span></div></td><td><span style="font-size:9pt;font-weight:700">Alphabet Inc.</span></td></tr></table></div>
+
+<div style="margin-top:6pt"><span style="font-weight:700">ITEM 1B.</span><span style="font-weight:700">UNRESOLVED STAFF COMMENTS</span></div>
+<div><span style="font-weight:400">Not applicable to this synthetic fixture; this sentence must never appear in a risk-factor chunk.</span></div>
+<div style="margin-top:6pt"><span style="font-weight:700">ITEM 1C.</span><span style="font-weight:700">CYBERSECURITY</span></div>
+<div><span style="font-weight:400">Our cybersecurity program description belongs to Item 1C and must never appear in a risk-factor chunk.</span></div>
+<div style="margin-top:6pt"><span style="font-weight:700">ITEM 2.</span><span style="font-weight:700">PROPERTIES</span></div>
+
+<div><span style="font-weight:400">Management's discussion: revenues increased year over year. For details on supply chain and other risks, refer to Part 1, Item 1A, "Risk Factors" of this Annual Report on Form 10-K.</span></div>
+<div><span style="font-weight:700">EXHIBIT INDEX</span></div>
+<div><span style="font-weight:400">10.01 Form of Indemnification Agreement entered into between the Registrant and its directors and officers, incorporated herein by reference.</span></div>
+<div><span style="font-weight:700">SIGNATURES</span></div>
+<div><span style="font-weight:400">Pursuant to the requirements of the Securities Exchange Act of 1934, the registrant has duly caused this report to be signed on its behalf by the undersigned.</span></div>
+</body></html>

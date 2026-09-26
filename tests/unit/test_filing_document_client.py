@@ -211,3 +211,119 @@ def test_fetch_10k_primary_document_html_raises_clearly_for_unknown_accession():
     import pytest
     with pytest.raises(ValueError, match="not found"):
         fetch_10k_primary_document_html(client, "0000000001", "0000000001-99-999999")
+
+
+# ---------------------------------------------------------------------------
+# Regression tests for the real Alphabet FY2025 failure (and the same defect
+# found in Apple, NVIDIA, Coca-Cola, Amazon, JPMorgan, Microsoft, Tesla and
+# J&J 10-Ks). See tests/fixtures/inline_xbrl_10k_structure.html for exactly
+# which real structures that fixture reproduces.
+# ---------------------------------------------------------------------------
+from pathlib import Path  # noqa: E402
+
+from src.ingestion.filing_document_client import MAX_CHUNK_CHARS  # noqa: E402
+
+_INLINE_XBRL_HTML = (
+    Path(__file__).parent.parent / "fixtures" / "inline_xbrl_10k_structure.html"
+).read_text()
+
+
+def _inline_chunks(html_text: str = _INLINE_XBRL_HTML):
+    return extract_item_1a_chunks(
+        html_text, cik="0001652044", entity_name="Alphabet Inc.",
+        fiscal_year=2025, accession_number="0001652044-26-000018",
+        source_document_url="https://example.invalid/goog-20251231.htm",
+    )
+
+
+def test_cross_reference_after_the_section_is_not_mistaken_for_the_heading():
+    """The original extractor took the LAST "Item 1A" mention as the heading.
+    In the real Alphabet 10-K that was a cross-reference in a later section,
+    so the "risk factors" evidence became financial statements, the exhibit
+    index (10.01) and signatures — one 172,261-character chunk."""
+    chunks = _inline_chunks()
+    text = " ".join(c.text for c in chunks)
+    assert chunks
+    assert "advertis" in text.lower() and "competition" in text.lower()
+    for leaked in ("10.01", "EXHIBIT INDEX", "SIGNATURES", "Securities Exchange Act",
+                   "Management's discussion", "forward-looking statements"):
+        assert leaked not in text, leaked
+
+
+def test_section_stops_at_item_1b_and_never_includes_item_1c():
+    text = " ".join(c.text for c in _inline_chunks())
+    assert "must never appear" not in text
+    assert "UNRESOLVED STAFF COMMENTS" not in text
+    assert "cybersecurity program description" not in text
+
+
+def test_inline_styled_bold_headings_are_detected():
+    """Modern inline-XBRL filings mark headings with font-weight:700 spans,
+    not <b>/<strong>; the old extractor found no headings at all."""
+    headings = {c.heading for c in _inline_chunks()}
+    assert not any(h.startswith("Risk Factor ") for h in headings)
+    assert any(h.startswith("We face intense competition") for h in headings)
+
+
+def test_long_risk_titles_are_headings_not_silently_dropped():
+    """Real risk titles run past the old 150-character heading limit; the old
+    code discarded such bold text entirely (neither heading nor body)."""
+    chunks = _inline_chunks()
+    advertising = next(c for c in chunks if "Advertisers can terminate" in c.text)
+    assert len(advertising.heading) > 150
+    assert advertising.heading.startswith("We generate most of our revenues from advertising")
+
+
+def test_running_headers_page_numbers_and_toc_links_are_removed():
+    chunks = _inline_chunks()
+    text = " ".join(c.text for c in chunks)
+    assert "Table of Contents" not in text
+    assert "Alphabet Inc." not in {c.heading for c in chunks}
+    # The sentence broken across the page (with "21." and the header in the
+    # middle) is rejoined without the page furniture.
+    assert "our margins over time, and could require us" in text
+
+
+def test_every_chunk_is_bounded_and_no_filing_text_is_lost():
+    """A long body is split on paragraph boundaries; every sentence of the
+    section survives exactly once."""
+    long_para = "<div><span>" + " ".join(
+        f"Sentence {i} describes a distinct liquidity risk in detail." for i in range(120)
+    ) + "</span></div>"
+    html_text = _INLINE_XBRL_HTML.replace(
+        "<div><span style=\"font-style:italic;font-weight:700\">Cyberattacks",
+        long_para + "<div><span style=\"font-style:italic;font-weight:700\">Cyberattacks",
+    )
+    chunks = _inline_chunks(html_text)
+    assert max(len(c.text) for c in chunks) <= MAX_CHUNK_CHARS
+    text = " ".join(c.text for c in chunks)
+    for i in range(120):
+        assert text.count(f"Sentence {i} describes") == 1
+
+
+def test_non_breaking_space_entity_in_item_heading_is_recognized():
+    """Real filings (e.g. Amazon's) write the heading as "Item&#160;1A."."""
+    html_text = _INLINE_XBRL_HTML.replace(
+        '<span style="font-weight:700">ITEM 1A.</span>',
+        '<span style="font-weight:700">Item&#160;1A.</span>',
+    ).replace(
+        '<span style="font-weight:700">ITEM 1B.</span>',
+        '<span style="font-weight:700">Item&#160;1B.</span>',
+    )
+    chunks = _inline_chunks(html_text)
+    assert any("Advertisers can terminate" in c.text for c in chunks)
+    assert "must never appear" not in " ".join(c.text for c in chunks)
+
+
+def test_section_with_no_closing_item_heading_is_rejected_not_run_to_end():
+    """With no Item 1B/1C/2 heading after Item 1A, the extractor must return
+    nothing rather than treat the rest of the filing as risk factors."""
+    html_text = (
+        '<html><body><div><span style="font-weight:700">ITEM 1A. RISK FACTORS</span></div>'
+        '<div><span>We face risks that could harm our business and financial condition in many ways '
+        'described here at length for the purpose of this test.</span></div>'
+        '<div><span style="font-weight:700">EXHIBIT INDEX</span></div>'
+        '<div><span>10.01 Form of Indemnification Agreement, incorporated by reference.</span></div>'
+        '</body></html>'
+    )
+    assert _inline_chunks(html_text) == []
